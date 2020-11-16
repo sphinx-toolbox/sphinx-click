@@ -28,13 +28,14 @@ Sphinx extension that automatically documents click applications.
 #  OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
+# stdlib
 import traceback
 import warnings
 
+# 3rd party
 import click
-from docutils import nodes
+from docutils import nodes, statemachine
 from docutils.parsers.rst import directives
-from docutils import statemachine
 from docutils.statemachine import ViewList
 from sphinx.util.docutils import SphinxDirective
 from sphinx_toolbox.utils import Purger
@@ -45,10 +46,11 @@ __license__: str = "MIT License"
 __version__: str = "0.0.0"
 __email__: str = "dominic@davis-foster.co.uk"
 
+__all__ = ["ClickDirective", "nested", "setup"]
 
-NESTED_FULL = 'full'
-NESTED_SHORT = 'short'
-NESTED_NONE = 'none'
+NESTED_FULL = "full"
+NESTED_SHORT = "short"
+NESTED_NONE = "none"
 
 click_purger = Purger("all_click")
 
@@ -64,7 +66,10 @@ def _indent(text, level=1):
 
 
 def _get_usage(ctx):
-	"""Alternative, non-prefixed version of 'get_usage'."""
+	"""
+	Alternative, non-prefixed version of 'get_usage'.
+	"""
+
 	formatter = ctx.make_formatter()
 	pieces = ctx.command.collect_usage_pieces(ctx)
 	formatter.write_usage(ctx.command_path, ' '.join(pieces), prefix='')
@@ -87,8 +92,8 @@ def _get_help_record(opt):
 		if not opt.is_flag and not opt.count:
 			name = opt.name
 			if opt.metavar:
-				name = opt.metavar.lstrip('<[{($').rstrip('>]})$')
-			rv += ' <{}>'.format(name)
+				name = opt.metavar.lstrip("<[{($").rstrip(">]})$")
+			rv += f" <{name}>"
 		return rv
 
 	rv = [_write_opts(opt.opts)]
@@ -98,12 +103,12 @@ def _get_help_record(opt):
 	out = []
 	if opt.help:
 		if opt.required:
-			out.append('**Required** %s' % opt.help)
+			out.append("**Required** %s" % opt.help)
 		else:
 			out.append(opt.help)
 	else:
 		if opt.required:
-			out.append('**Required**')
+			out.append("**Required**")
 
 	extras = []
 
@@ -112,19 +117,18 @@ def _get_help_record(opt):
 			# Starting from Click 7.0 this can be a string as well. This is
 			# mostly useful when the default is not a constant and
 			# documentation thus needs a manually written string.
-			extras.append(':default: %s' % opt.show_default)
+			extras.append(":default: %s" % opt.show_default)
 		else:
 			extras.append(
-					':default: %s'
-					% (
-							', '.join('%s' % d for d in opt.default)
-							if isinstance(opt.default, (list, tuple))
-							else opt.default,
+					":default: {}".format(
+							", ".join("%s" % d
+										for d in opt.default) if isinstance(opt.default,
+																			(list, tuple)) else opt.default,
 							)
 					)
 
 	if isinstance(opt.type, click.Choice):
-		extras.append(':options: %s' % ' | '.join(opt.type.choices))
+		extras.append(":options: %s" % " | ".join(opt.type.choices))
 
 	if extras:
 		if out:
@@ -132,36 +136,39 @@ def _get_help_record(opt):
 
 		out.extend(extras)
 
-	return ', '.join(rv), '\n'.join(out)
+	return ", ".join(rv), '\n'.join(out)
 
 
 def _format_description(ctx):
-	"""Format the description for a given `click.Command`.
+	"""
+	Format the description for a given `click.Command`.
 
 	We parse this as reStructuredText, allowing users to embed rich
 	information in their help messages if they so choose.
 	"""
+
 	help_string = ctx.command.help or ctx.command.short_help
 	if not help_string:
 		return
 
 	bar_enabled = False
-	for line in statemachine.string2lines(
-			help_string, tab_width=4, convert_whitespace=True
-			):
-		if line == '\b':
+	for line in statemachine.string2lines(help_string, tab_width=4, convert_whitespace=True):
+		if line == '\x08':
 			bar_enabled = True
 			continue
 		if line == '':
 			bar_enabled = False
-		line = '| ' + line if bar_enabled else line
+		line = "| " + line if bar_enabled else line
 		yield line
 	yield ''
 
 
 def _format_usage(ctx):
-	"""Format the usage for a `click.Command`."""
-	yield '.. code-block:: shell'
+	"""
+	Format the usage for a `click.Command`.
+	"""
+
+	yield ".. code-block:: shell"
 	yield ''
 	for line in _get_usage(ctx).splitlines():
 		yield _indent(line)
@@ -169,30 +176,32 @@ def _format_usage(ctx):
 
 
 def _format_option(opt):
-	"""Format the output for a `click.Option`."""
+	"""
+	Format the output for a `click.Option`.
+	"""
+
 	opt = _get_help_record(opt)
 
-	yield '.. option:: {}'.format(opt[0])
+	yield ".. option:: {}".format(opt[0])
 	if opt[1]:
 		yield ''
-		for line in statemachine.string2lines(
-				opt[1], tab_width=4, convert_whitespace=True
-				):
+		for line in statemachine.string2lines(opt[1], tab_width=4, convert_whitespace=True):
 			yield _indent(line)
 
 
 def _format_options(ctx):
-	"""Format all `click.Option` for a `click.Command`."""
+	"""
+	Format all `click.Option` for a `click.Command`.
+	"""
+
 	# the hidden attribute is part of click 7.x only hence use of getattr
 	params = [
-			param
-			for param in ctx.command.params
-			if isinstance(param, click.Option) and not getattr(param, 'hidden', False)
+			param for param in ctx.command.params
+			if isinstance(param, click.Option) and not getattr(param, "hidden", False)
 			]
 
 	for param in params:
-		for line in _format_option(param):
-			yield line
+		yield from _format_option(param)
 		yield ''
 
 
@@ -205,26 +214,31 @@ def _format_argument(arg):
 	yield ''
 
 	if arg.required:
-		yield _indent(f'Required argument{"(s)" if arg.nargs != 1 else ""}')
+		yield _indent(f'Required argument{"(s)" if arg.nargs != 1 else ""}.')
 	else:
-		yield _indent(f'Optional argument{"(s)" if arg.nargs != 1 else ""}')
+		yield _indent(f'Optional argument{"(s)" if arg.nargs != 1 else ""}.')
 		yield _indent(f"Default ``{arg.default!r}``")
 
 
 def _format_arguments(ctx):
-	"""Format all `click.Argument` for a `click.Command`."""
+	"""
+	Format all `click.Argument` for a `click.Command`.
+	"""
+
 	params = [x for x in ctx.command.params if isinstance(x, click.Argument)]
 
 	for param in params:
-		for line in _format_argument(param):
-			yield line
+		yield from _format_argument(param)
 		yield ''
 
 
 def _format_envvar(param):
-	"""Format the envvars of a `click.Option` or `click.Argument`."""
-	yield '.. envvar:: {}'.format(param.envvar)
-	yield '   :noindex:'
+	"""
+	Format the envvars of a `click.Option` or `click.Argument`.
+	"""
+
+	yield f'.. envvar:: {param.envvar}'
+	yield "   :noindex:"
 	yield ''
 	if isinstance(param, click.Argument):
 		param_ref = param.human_readable_name
@@ -233,22 +247,24 @@ def _format_envvar(param):
 		# first. For example, if '--foo' or '-f' are possible, use '--foo'.
 		param_ref = param.opts[0]
 
-	yield _indent('Provide a default for :option:`{}`'.format(param_ref))
+	yield _indent(f'Provide a default for :option:`{param_ref}`')
 
 
 def _format_envvars(ctx):
-	"""Format all envvars for a `click.Command`."""
-	params = [x for x in ctx.command.params if getattr(x, 'envvar')]
+	"""
+	Format all envvars for a `click.Command`.
+	"""
+
+	params = [x for x in ctx.command.params if getattr(x, "envvar")]
 
 	for param in params:
-		yield '.. _{command_name}-{param_name}-{envvar}:'.format(
+		yield ".. _{command_name}-{param_name}-{envvar}:".format(
 				command_name=ctx.command_path.replace(' ', '-'),
 				param_name=param.name,
 				envvar=param.envvar,
 				)
 		yield ''
-		for line in _format_envvar(param):
-			yield line
+		yield from _format_envvar(param)
 		yield ''
 
 
@@ -281,10 +297,7 @@ def _format_epilog(ctx):
 	if not epilog_string:
 		return
 
-	for line in statemachine.string2lines(
-			epilog_string, tab_width=4, convert_whitespace=True
-			):
-		yield line
+	yield from statemachine.string2lines(epilog_string, tab_width=4, convert_whitespace=True)
 	yield ''
 
 
@@ -297,8 +310,11 @@ def _get_lazyload_commands(multicommand):
 
 
 def _filter_commands(ctx, commands=None):
-	"""Return list of used commands."""
-	lookup = getattr(ctx.command, 'commands', {})
+	"""
+	Return list of used commands.
+	"""
+
+	lookup = getattr(ctx.command, "commands", {})
 	if not lookup and isinstance(ctx.command, click.MultiCommand):
 		lookup = _get_lazyload_commands(ctx.command)
 
@@ -310,21 +326,22 @@ def _filter_commands(ctx, commands=None):
 
 
 def _format_command(ctx, nested, commands=None):
-	"""Format the output of `click.Command`."""
+	"""
+	Format the output of `click.Command`.
+	"""
+
 	if ctx.command.hidden:
 		return
 
 	# description
 
-	for line in _format_description(ctx):
-		yield line
+	yield from _format_description(ctx)
 
-	yield '.. program:: {}'.format(ctx.command_path)
+	yield f'.. program:: {ctx.command_path}'
 
 	# usage
 
-	for line in _format_usage(ctx):
-		yield line
+	yield from _format_usage(ctx)
 
 	# options
 
@@ -332,36 +349,32 @@ def _format_command(ctx, nested, commands=None):
 	if lines:
 		# we use rubric to provide some separation without exploding the table
 		# of contents
-		yield '.. rubric:: Options'
+		yield ".. rubric:: Options"
 		yield ''
 
-	for line in lines:
-		yield line
+	yield from lines
 
 	# arguments
 
 	lines = list(_format_arguments(ctx))
 	if lines:
-		yield '.. rubric:: Arguments'
+		yield ".. rubric:: Arguments"
 		yield ''
 
-	for line in lines:
-		yield line
+	yield from lines
 
 	# environment variables
 
 	lines = list(_format_envvars(ctx))
 	if lines:
-		yield '.. rubric:: Environment variables'
+		yield ".. rubric:: Environment variables"
 		yield ''
 
-	for line in lines:
-		yield line
+	yield from lines
 
 	# description
 
-	for line in _format_epilog(ctx):
-		yield line
+	yield from _format_epilog(ctx)
 
 	# if we're nesting commands, we need to do this slightly differently
 	if nested in (NESTED_FULL, NESTED_NONE):
@@ -370,7 +383,7 @@ def _format_command(ctx, nested, commands=None):
 	commands = _filter_commands(ctx, commands)
 
 	if commands:
-		yield '.. rubric:: Commands'
+		yield ".. rubric:: Commands"
 		yield ''
 
 	for command in commands:
@@ -378,8 +391,7 @@ def _format_command(ctx, nested, commands=None):
 		if command.hidden:
 			continue
 
-		for line in _format_subcommand(command):
-			yield line
+		yield from _format_subcommand(command)
 		yield ''
 
 
@@ -390,8 +402,7 @@ def nested(argument):
 
 	if argument not in values:
 		raise ValueError(
-				"%s is not a valid value for ':nested:'; allowed values: %s"
-				% directives.format_values(values)
+				"%s is not a valid value for ':nested:'; allowed values: %s" % directives.format_values(values)
 				)
 
 	return argument
@@ -402,10 +413,10 @@ class ClickDirective(SphinxDirective):
 	has_content = False
 	required_arguments = 1
 	option_spec = {
-			'prog': directives.unchanged_required,
-			'nested': nested,
-			'commands': directives.unchanged,
-			'show-nested': directives.flag,
+			"prog": directives.unchanged_required,
+			"nested": nested,
+			"commands": directives.unchanged,
+			"show-nested": directives.flag,
 			}
 
 	def _generate_nodes(self, name, command, parent, nested, commands=None):
@@ -446,7 +457,7 @@ class ClickDirective(SphinxDirective):
 		return [targetnode, click_node]
 
 	def _load_module(self, module_path):
-		"""Load the module."""
+		"Load the module."
 		# __import__ will fail on unicode,
 		# so we ensure module path is a string here.
 		module_path = str(module_path)
@@ -454,27 +465,21 @@ class ClickDirective(SphinxDirective):
 		try:
 			module_name, attr_name = module_path.split(':', 1)
 		except ValueError:  # noqa
-			raise self.error(
-					'"{}" is not of format "module:parser"'.format(module_path)
-					)
+			raise self.error(f'"{module_path}" is not of format "module:parser"')
 
 		try:
 			mod = __import__(module_name, globals(), locals(), [attr_name])
 		except (Exception, SystemExit) as exc:  # noqa
-			err_msg = 'Failed to import "{}" from "{}". '.format(attr_name, module_name)
+			err_msg = f'Failed to import "{attr_name}" from "{module_name}". '
 			if isinstance(exc, SystemExit):
-				err_msg += 'The module appeared to call sys.exit()'
+				err_msg += "The module appeared to call sys.exit()"
 			else:
-				err_msg += 'The following exception was raised:\n{}'.format(
-						traceback.format_exc()
-						)
+				err_msg += f'The following exception was raised:\n{traceback.format_exc()}'
 
 			raise self.error(err_msg)
 
 		if not hasattr(mod, attr_name):
-			raise self.error(
-					'Module "{}" has no attribute "{}"'.format(module_name, attr_name)
-					)
+			raise self.error(f'Module "{module_name}" has no attribute "{attr_name}"')
 
 		parser = getattr(mod, attr_name)
 

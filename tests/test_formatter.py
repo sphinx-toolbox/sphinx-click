@@ -1,31 +1,36 @@
+# stdlib
 import textwrap
-import unittest
 
+# 3rd party
 import click
-from sphinx_click import ext
+
+# this package
+import sphinx_click
 
 
-class CommandTestCase(unittest.TestCase):
-    """Validate basic ``click.Command`` instances."""
+class TestCommand:
+	"""
+	Validate basic ``click.Command`` instances.
+	"""
 
-    def test_no_parameters(self):
-        """Validate a `click.Command` with no parameters.
+	def test_no_parameters(self):
+		"""Validate a `click.Command` with no parameters.
 
-        This exercises the code paths for a command with *no* arguments, *no*
-        options and *no* environment variables.
-        """
+		This exercises the code paths for a command with *no* arguments, *no*
+		options and *no* environment variables.
+		"""
 
-        @click.command()
-        def foobar():
-            """A sample command."""
-            pass
+		@click.command()
+		def foobar():
+			"""
+			A sample command.
+			"""
 
-        ctx = click.Context(foobar, info_name='foobar')
-        output = list(ext._format_command(ctx, nested='short'))
+		ctx = click.Context(foobar, info_name="foobar")
+		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		assert textwrap.dedent(
+						"""
         A sample command.
 
         .. program:: foobar
@@ -33,36 +38,34 @@ class CommandTestCase(unittest.TestCase):
 
             foobar [OPTIONS]
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
-    def test_basic_parameters(self):
-        """Validate a combination of parameters.
+	def test_basic_parameters(self):
+		"""
+		Validate a combination of parameters.
 
-        This exercises the code paths for a command with arguments, options and
-        environment variables.
-        """
+		This exercises the code paths for a command with arguments, options and
+		environment variables.
+		"""
 
-        @click.command()
-        @click.option('--param', envvar='PARAM', help='A sample option')
-        @click.option('--another', metavar='[FOO]', help='Another option')
-        @click.option(
-            '--choice',
-            help='A sample option with choices',
-            type=click.Choice(['Option1', 'Option2']),
-        )
-        @click.argument('ARG', envvar='ARG')
-        def foobar(bar):
-            """A sample command."""
-            pass
+		@click.command()
+		@click.option("--param", envvar="PARAM", help="A sample option")
+		@click.option("--another", metavar="[FOO]", help="Another option")
+		@click.option(
+				"--choice",
+				help="A sample option with choices",
+				type=click.Choice(["Option1", "Option2"]),
+				)
+		@click.argument("ARG", envvar="ARG")
+		def foobar(bar):
+			"A sample command."
+			pass
 
-        ctx = click.Context(foobar, info_name='foobar')
-        output = list(ext._format_command(ctx, nested='short'))
+		ctx = click.Context(foobar, info_name="foobar")
+		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		assert textwrap.dedent(
+						"""
         A sample command.
 
         .. program:: foobar
@@ -90,7 +93,7 @@ class CommandTestCase(unittest.TestCase):
 
         .. option:: ARG
 
-            Required argument
+            Required argument.
 
         .. rubric:: Environment variables
 
@@ -108,24 +111,23 @@ class CommandTestCase(unittest.TestCase):
 
             Provide a default for :option:`ARG`
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
-    def test_help_epilog(self):
-        """Validate formatting of explicit help and epilog strings."""
+	def test_help_epilog(self):
+		"""
+		Validate formatting of explicit help and epilog strings.
+		"""
 
-        @click.command(help='A sample command.', epilog='A sample epilog.')
-        @click.option('--param', help='A sample option')
-        def foobar(bar):
-            pass
+		@click.command(help="A sample command.", epilog="A sample epilog.")
+		@click.option("--param", help="A sample option")
+		def foobar(bar):
+			pass
 
-        ctx = click.Context(foobar, info_name='foobar')
-        output = list(ext._format_command(ctx, nested='short'))
+		ctx = click.Context(foobar, info_name="foobar")
+		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		assert textwrap.dedent(
+						"""
         A sample command.
 
         .. program:: foobar
@@ -141,34 +143,30 @@ class CommandTestCase(unittest.TestCase):
 
         A sample epilog.
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
-    @unittest.skipIf(
-        ext.CLICK_VERSION < (7, 0),
-        'Allowing show_default to be a string was added in Click 7.0',
-    )
-    def test_defaults(self):
-        """Validate formatting of user documented defaults."""
+	def test_defaults(self):
+		"""
+		Validate formatting of user documented defaults.
+		"""
 
-        @click.command()
-        @click.option('--num-param', type=int, default=42, show_default=True)
-        @click.option(
-            '--param',
-            default=lambda: None,
-            show_default='Something computed at runtime',
-        )
-        def foobar(bar):
-            """A sample command."""
-            pass
+		@click.command()
+		@click.option("--num-param", type=int, default=42, show_default=True)
+		@click.option(
+				"--param",
+				default=lambda: None,
+				show_default="Something computed at runtime",
+				)
+		def foobar(bar):
+			"""
+			A sample command.
+			"""
 
-        ctx = click.Context(foobar, info_name='foobar')
-        output = list(ext._format_command(ctx, nested='short'))
+		ctx = click.Context(foobar, info_name="foobar")
+		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		assert textwrap.dedent(
+						"""
         A sample command.
 
         .. program:: foobar
@@ -186,48 +184,48 @@ class CommandTestCase(unittest.TestCase):
 
             :default: Something computed at runtime
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
-    @unittest.skipIf(
-        ext.CLICK_VERSION < (7, 0), 'The hidden flag was added in Click 7.0'
-    )
-    def test_hidden(self):
-        """Validate a `click.Command` with the `hidden` flag."""
+	def test_hidden(self):
+		"""
+		Validate a `click.Command` with the `hidden` flag.
+		"""
 
-        @click.command(hidden=True)
-        def foobar():
-            """A sample command."""
-            pass
+		@click.command(hidden=True)
+		def foobar():
+			"""
+			A sample command.
+			"""
 
-        ctx = click.Context(foobar, info_name='foobar')
-        output = list(ext._format_command(ctx, nested='short'))
+		ctx = click.Context(foobar, info_name="foobar")
+		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-        self.assertEqual('', '\n'.join(output))
+		assert '' ==  '\n'.join(output)
 
-    def test_titles(self):
-        """Validate a `click.Command` with nested titles."""
+	def test_titles(self):
+		"""
+		Validate a `click.Command` with nested titles.
+		"""
 
-        @click.command()
-        @click.option('--name', help='Name to say hello to.', required=True, type=str)
-        def hello(name):
-            """Prints hello to name given.
+		@click.command()
+		@click.option("--name", help="Name to say hello to.", required=True, type=str)
+		def hello(name):
+			"""
+			Prints hello to name given.
 
-            Examples
-            --------
+			Examples
+			--------
 
-            .. code:: bash
+			.. code:: bash
 
-                my_cli hello --name "Jack"
+				my_cli hello --name "Jack"
             """
 
-        ctx = click.Context(hello, info_name='hello')
-        output = list(ext._format_command(ctx, nested='short'))
+		ctx = click.Context(hello, info_name="hello")
+		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		assert textwrap.dedent(
+						"""
         Prints hello to name given.
 
         Examples
@@ -235,7 +233,7 @@ class CommandTestCase(unittest.TestCase):
 
         .. code:: bash
 
-            my_cli hello --name "Jack"
+                my_cli hello --name "Jack"
 
         .. program:: hello
         .. code-block:: shell
@@ -248,32 +246,32 @@ class CommandTestCase(unittest.TestCase):
 
             **Required** Name to say hello to.
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
 
-class GroupTestCase(unittest.TestCase):
-    """Validate basic ``click.Group`` instances."""
+class TestGroup:
+	"""
+	Validate basic ``click.Group`` instances.
+	"""
 
-    def test_no_parameters(self):
-        """Validate a `click.Group` with no parameters.
+	def test_no_parameters(self):
+		"""Validate a `click.Group` with no parameters.
 
-        This exercises the code paths for a group with *no* arguments, *no*
-        options and *no* environment variables.
-        """
+		This exercises the code paths for a group with *no* arguments, *no*
+		options and *no* environment variables.
+		"""
 
-        @click.group()
-        def cli():
-            """A sample command group."""
-            pass
+		@click.group()
+		def cli():
+			"""
+			A sample command group.
+			"""
 
-        ctx = click.Context(cli, info_name='cli')
-        output = list(ext._format_command(ctx, nested='short'))
+		ctx = click.Context(cli, info_name="cli")
+		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		assert textwrap.dedent(
+						"""
         A sample command group.
 
         .. program:: cli
@@ -281,30 +279,29 @@ class GroupTestCase(unittest.TestCase):
 
             cli [OPTIONS] COMMAND [ARGS]...
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
-    def test_basic_parameters(self):
-        """Validate a combination of parameters.
+	def test_basic_parameters(self):
+		"""
+		Validate a combination of parameters.
 
-        This exercises the code paths for a group with arguments, options and
-        environment variables.
-        """
+		This exercises the code paths for a group with arguments, options and
+		environment variables.
+		"""
 
-        @click.group()
-        @click.option('--param', envvar='PARAM', help='A sample option')
-        @click.argument('ARG', envvar='ARG')
-        def cli():
-            """A sample command group."""
-            pass
+		@click.group()
+		@click.option("--param", envvar="PARAM", help="A sample option")
+		@click.argument("ARG", envvar="ARG")
+		def cli():
+			"""
+			A sample command group.
+			"""
 
-        ctx = click.Context(cli, info_name='cli')
-        output = list(ext._format_command(ctx, nested='short'))
+		ctx = click.Context(cli, info_name="cli")
+		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		assert textwrap.dedent(
+						"""
         A sample command group.
 
         .. program:: cli
@@ -322,7 +319,7 @@ class GroupTestCase(unittest.TestCase):
 
         .. option:: ARG
 
-            Required argument
+            Required argument.
 
         .. rubric:: Environment variables
 
@@ -340,36 +337,34 @@ class GroupTestCase(unittest.TestCase):
 
             Provide a default for :option:`ARG`
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
-    def test_no_line_wrapping(self):
-        r"""Validate behavior when a \b character is present.
+	def test_no_line_wrapping(self):
+		r"""
+		Validate behavior when a \b character is present.
 
-        https://click.palletsprojects.com/en/7.x/documentation/#preventing-rewrapping
+		https://click.palletsprojects.com/en/7.x/documentation/#preventing-rewrapping
         """
 
-        @click.group()
-        def cli():
-            """A sample command group.
+		@click.group()
+		def cli():
+			"""
+			A sample command group.
 
-            \b
-            This is
-            a paragraph
-            without rewrapping.
+			\b
+			This is
+			a paragraph
+			without rewrapping.
 
-            And this is a paragraph
-            that will be rewrapped again.
-            """
-            pass
+			And this is a paragraph
+			that will be rewrapped again.
+			"""
 
-        ctx = click.Context(cli, info_name='cli')
-        output = list(ext._format_command(ctx, nested='short'))
+		ctx = click.Context(cli, info_name="cli")
+		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		assert textwrap.dedent(
+						"""
         A sample command group.
 
         | This is
@@ -384,41 +379,46 @@ class GroupTestCase(unittest.TestCase):
 
             cli [OPTIONS] COMMAND [ARGS]...
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
 
-class NestedCommandsTestCase(unittest.TestCase):
-    """Validate ``click.Command`` instances inside ``click.Group`` instances."""
+class TestNestedCommands:
+	"""
+	Validate ``click.Command`` instances inside ``click.Group`` instances.
+	"""
 
-    @staticmethod
-    def _get_ctx():
-        @click.group()
-        def cli():
-            """A sample command group."""
-            pass
+	@staticmethod
+	def _get_ctx():
 
-        @cli.command()
-        def hello():
-            """A sample command."""
-            pass
+		@click.group()
+		def cli():
+			"""
+			A sample command group.
+			"""
+			pass
 
-        return click.Context(cli, info_name='cli')
+		@cli.command()
+		def hello():
+			"""
+			A sample command.
+			"""
+			pass
 
-    def test_nested_short(self):
-        """Validate a nested command with 'nested' of 'short' (default).
+		return click.Context(cli, info_name="cli")
 
-        We should list minimal help texts for sub-commands since they're not
-        being handled separately.
-        """
+	def test_nested_short(self):
+		"""
+		Validate a nested command with 'nested' of 'short' (default).
 
-        ctx = self._get_ctx()
-        output = list(ext._format_command(ctx, nested='short'))
+		We should list minimal help texts for sub-commands since they're not
+		being handled separately.
+		"""
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		ctx = self._get_ctx()
+		output = list(sphinx_click._format_command(ctx, nested="short"))
+
+		assert textwrap.dedent(
+						"""
         A sample command group.
 
         .. program:: cli
@@ -432,22 +432,20 @@ class NestedCommandsTestCase(unittest.TestCase):
 
             A sample command.
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
-    def test_nested_full(self):
-        """Validate a nested command with 'nested' of 'full'.
+	def test_nested_full(self):
+		"""
+		Validate a nested command with 'nested' of 'full'.
 
-        We should not list sub-commands since they're being handled separately.
-        """
+		We should not list sub-commands since they're being handled separately.
+		"""
 
-        ctx = self._get_ctx()
-        output = list(ext._format_command(ctx, nested='full'))
+		ctx = self._get_ctx()
+		output = list(sphinx_click._format_command(ctx, nested="full"))
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		assert textwrap.dedent(
+						"""
         A sample command group.
 
         .. program:: cli
@@ -455,22 +453,20 @@ class NestedCommandsTestCase(unittest.TestCase):
 
             cli [OPTIONS] COMMAND [ARGS]...
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
-    def test_nested_none(self):
-        """Validate a nested command with 'nested' of 'none'.
+	def test_nested_none(self):
+		"""
+		Validate a nested command with 'nested' of 'none'.
 
-        We should not list sub-commands.
-        """
+		We should not list sub-commands.
+		"""
 
-        ctx = self._get_ctx()
-        output = list(ext._format_command(ctx, nested='none'))
+		ctx = self._get_ctx()
+		output = list(sphinx_click._format_command(ctx, nested="none"))
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		assert textwrap.dedent(
+						"""
         A sample command group.
 
         .. program:: cli
@@ -478,39 +474,47 @@ class NestedCommandsTestCase(unittest.TestCase):
 
             cli [OPTIONS] COMMAND [ARGS]...
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
 
-class CommandFilterTestCase(unittest.TestCase):
-    """Validate filtering of commands."""
+class TestCommandFilter:
+	"""
+	Validate filtering of commands.
+	"""
 
-    @staticmethod
-    def _get_ctx():
-        @click.group()
-        def cli():
-            """A sample command group."""
+	@staticmethod
+	def _get_ctx():
 
-        @cli.command()
-        def hello():
-            """A sample command."""
+		@click.group()
+		def cli():
+			"""
+			A sample command group.
+			"""
 
-        @cli.command()
-        def world():
-            """A world command."""
+		@cli.command()
+		def hello():
+			"""
+			A sample command.
+			"""
 
-        return click.Context(cli, info_name='cli')
+		@cli.command()
+		def world():
+			"""
+			A world command.
+			"""
 
-    def test_no_commands(self):
-        """Validate an empty command group."""
+		return click.Context(cli, info_name="cli")
 
-        ctx = self._get_ctx()
-        output = list(ext._format_command(ctx, nested='short', commands=''))
+	def test_no_commands(self):
+		"""
+		Validate an empty command group.
+		"""
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		ctx = self._get_ctx()
+		output = list(sphinx_click._format_command(ctx, nested="short", commands=''))
+
+		assert textwrap.dedent(
+						"""
         A sample command group.
 
         .. program:: cli
@@ -518,19 +522,18 @@ class CommandFilterTestCase(unittest.TestCase):
 
             cli [OPTIONS] COMMAND [ARGS]...
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
-    def test_order_of_commands(self):
-        """Validate the order of commands."""
+	def test_order_of_commands(self):
+		"""
+		Validate the order of commands.
+		"""
 
-        ctx = self._get_ctx()
-        output = list(ext._format_command(ctx, nested='short', commands='world, hello'))
+		ctx = self._get_ctx()
+		output = list(sphinx_click._format_command(ctx, nested="short", commands="world, hello"))
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		assert textwrap.dedent(
+						"""
         A sample command group.
 
         .. program:: cli
@@ -548,48 +551,52 @@ class CommandFilterTestCase(unittest.TestCase):
 
             A sample command.
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
 
-class CustomMultiCommandTestCase(unittest.TestCase):
-    """Validate ``click.MultiCommand`` instances."""
+class TestCustomMultiCommand:
+	"""
+	Validate ``click.MultiCommand`` instances.
+	"""
 
-    def test_basics(self):
-        """Validate a custom ``click.MultiCommand`` with no parameters.
+	def test_basics(self):
+		"""
+		Validate a custom ``click.MultiCommand`` with no parameters.
 
-        This exercises the code paths to extract commands correctly from these
-        commands.
-        """
+		This exercises the code paths to extract commands correctly from these
+		commands.
+		"""
 
-        @click.command()
-        def hello():
-            """A sample command."""
+		@click.command()
+		def hello():
+			"""
+			A sample command.
+			"""
 
-        @click.command()
-        def world():
-            """A world command."""
+		@click.command()
+		def world():
+			"""
+			A world command.
+			"""
 
-        class MyCLI(click.MultiCommand):
-            _command_mapping = {
-                'hello': hello,
-                'world': world,
-            }
+		class MyCLI(click.MultiCommand):
+			_command_mapping = {
+					"hello": hello,
+					"world": world,
+					}
 
-            def list_commands(self, ctx):
-                return ['hello', 'world']
+			def list_commands(self, ctx):
+				return ["hello", "world"]
 
-            def get_command(self, ctx, name):
-                return self._command_mapping[name]
+			def get_command(self, ctx, name):
+				return self._command_mapping[name]
 
-        cli = MyCLI(help='A sample custom multicommand.')
-        ctx = click.Context(cli, info_name='cli')
-        output = list(ext._format_command(ctx, nested='short'))
+		cli = MyCLI(help="A sample custom multicommand.")
+		ctx = click.Context(cli, info_name="cli")
+		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		assert textwrap.dedent(
+						"""
         A sample custom multicommand.
 
         .. program:: cli
@@ -607,49 +614,51 @@ class CustomMultiCommandTestCase(unittest.TestCase):
 
             A world command.
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
 
-    @unittest.skipIf(
-        ext.CLICK_VERSION < (7, 0), 'The hidden flag was added in Click 7.0'
-    )
-    def test_hidden(self):
-        """Ensure 'hidden' subcommands are not shown."""
+	def test_hidden(self):
+		"""
+		Ensure 'hidden' subcommands are not shown.
+		"""
 
-        @click.command()
-        def hello():
-            """A sample command."""
+		@click.command()
+		def hello():
+			"""
+			A sample command.
+			"""
 
-        @click.command()
-        def world():
-            """A world command."""
+		@click.command()
+		def world():
+			"""
+			A world command.
+			"""
 
-        @click.command(hidden=True)
-        def hidden():
-            """A hidden command."""
+		@click.command(hidden=True)
+		def hidden():
+			"""
+			A hidden command.
+			"""
 
-        class MyCLI(click.MultiCommand):
-            _command_mapping = {
-                'hello': hello,
-                'world': world,
-                'hidden': hidden,
-            }
+		class MyCLI(click.MultiCommand):
+			_command_mapping = {
+					"hello": hello,
+					"world": world,
+					"hidden": hidden,
+					}
 
-            def list_commands(self, ctx):
-                return ['hello', 'world', 'hidden']
+			def list_commands(self, ctx):
+				return ["hello", "world", "hidden"]
 
-            def get_command(self, ctx, name):
-                return self._command_mapping[name]
+			def get_command(self, ctx, name):
+				return self._command_mapping[name]
 
-        cli = MyCLI(help='A sample custom multicommand.')
-        ctx = click.Context(cli, info_name='cli')
-        output = list(ext._format_command(ctx, nested='short'))
+		cli = MyCLI(help="A sample custom multicommand.")
+		ctx = click.Context(cli, info_name="cli")
+		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-        # Note that we do NOT expect this to show the 'hidden' command
-        self.assertEqual(
-            textwrap.dedent(
-                """
+		# Note that we do NOT expect this to show the 'hidden' command
+		assert textwrap.dedent(
+						"""
         A sample custom multicommand.
 
         .. program:: cli
@@ -667,6 +676,4 @@ class CustomMultiCommandTestCase(unittest.TestCase):
 
             A world command.
         """
-            ).lstrip(),
-            '\n'.join(output),
-        )
+						).lstrip() == '\n'.join(output)
