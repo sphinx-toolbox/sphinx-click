@@ -1,6 +1,3 @@
-# stdlib
-import textwrap
-
 # 3rd party
 import click
 from domdf_python_tools.testing import check_file_regression
@@ -30,8 +27,7 @@ class TestCommand:
 
 		ctx = click.Context(foobar, info_name="foobar")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 	def test_basic_parameters(self, file_regression: FileRegressionFixture):
 		"""
@@ -58,8 +54,7 @@ class TestCommand:
 
 		ctx = click.Context(foobar, info_name="foobar")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 	def test_help_epilog(self, file_regression: FileRegressionFixture):
 		"""
@@ -73,8 +68,7 @@ class TestCommand:
 
 		ctx = click.Context(foobar, info_name="foobar")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 	def test_defaults(self, file_regression: FileRegressionFixture):
 		"""
@@ -95,8 +89,7 @@ class TestCommand:
 
 		ctx = click.Context(foobar, info_name="foobar")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 	def test_hidden(self):
 		"""
@@ -135,8 +128,7 @@ class TestCommand:
 
 		ctx = click.Context(hello, info_name="hello")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 
 class TestGroup:
@@ -159,8 +151,7 @@ class TestGroup:
 
 		ctx = click.Context(cli, info_name="cli")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 	def test_basic_parameters_group(self, file_regression: FileRegressionFixture):
 		"""
@@ -180,8 +171,7 @@ class TestGroup:
 
 		ctx = click.Context(cli, info_name="cli")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 	def test_no_line_wrapping(self, file_regression: FileRegressionFixture):
 		r"""
@@ -206,8 +196,7 @@ class TestGroup:
 
 		ctx = click.Context(cli, info_name="cli")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 
 class TestNestedCommands:
@@ -244,8 +233,7 @@ class TestNestedCommands:
 
 		ctx = self._get_ctx()
 		output = list(sphinx_click._format_command(ctx, nested="short"))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 	def test_nested_full(self, file_regression: FileRegressionFixture):
 		"""
@@ -256,8 +244,7 @@ class TestNestedCommands:
 
 		ctx = self._get_ctx()
 		output = list(sphinx_click._format_command(ctx, nested="full"))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 	def test_nested_none(self, file_regression: FileRegressionFixture):
 		"""
@@ -268,8 +255,7 @@ class TestNestedCommands:
 
 		ctx = self._get_ctx()
 		output = list(sphinx_click._format_command(ctx, nested="none"))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 
 class TestCommandFilter:
@@ -307,8 +293,7 @@ class TestCommandFilter:
 
 		ctx = self._get_ctx()
 		output = list(sphinx_click._format_command(ctx, nested="short", commands=''))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 	def test_order_of_commands(self, file_regression: FileRegressionFixture):
 		"""
@@ -317,8 +302,7 @@ class TestCommandFilter:
 
 		ctx = self._get_ctx()
 		output = list(sphinx_click._format_command(ctx, nested="short", commands="world, hello"))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 
 class TestCustomMultiCommand:
@@ -361,8 +345,7 @@ class TestCustomMultiCommand:
 		cli = MyCLI(help="A sample custom multicommand.")
 		ctx = click.Context(cli, info_name="cli")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
-
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
 
 	def test_hidden(self, file_regression: FileRegressionFixture):
 		"""
@@ -405,4 +388,4 @@ class TestCustomMultiCommand:
 		output = list(sphinx_click._format_command(ctx, nested="short"))
 
 		# Note that we do NOT expect this to show the 'hidden' command
-		check_file_regression('\n'.join(output), file_regression)
+		check_file_regression('\n'.join(output), file_regression, extension=".rst")
