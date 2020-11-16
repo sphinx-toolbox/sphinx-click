@@ -3,6 +3,8 @@ import textwrap
 
 # 3rd party
 import click
+from domdf_python_tools.testing import check_file_regression
+from pytest_regressions.file_regression import FileRegressionFixture
 
 # this package
 import sphinx_click
@@ -13,7 +15,7 @@ class TestCommand:
 	Validate basic ``click.Command`` instances.
 	"""
 
-	def test_no_parameters(self):
+	def test_no_parameters(self, file_regression: FileRegressionFixture):
 		"""Validate a `click.Command` with no parameters.
 
 		This exercises the code paths for a command with *no* arguments, *no*
@@ -29,18 +31,9 @@ class TestCommand:
 		ctx = click.Context(foobar, info_name="foobar")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-		assert textwrap.dedent(
-						"""
-        A sample command.
+		check_file_regression('\n'.join(output), file_regression)
 
-        .. program:: foobar
-        .. code-block:: shell
-
-            foobar [OPTIONS]
-        """
-						).lstrip() == '\n'.join(output)
-
-	def test_basic_parameters(self):
+	def test_basic_parameters(self, file_regression: FileRegressionFixture):
 		"""
 		Validate a combination of parameters.
 
@@ -58,62 +51,17 @@ class TestCommand:
 				)
 		@click.argument("ARG", envvar="ARG")
 		def foobar(bar):
-			"A sample command."
+			"""
+			A sample command.
+			"""
 			pass
 
 		ctx = click.Context(foobar, info_name="foobar")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-		assert textwrap.dedent(
-						"""
-        A sample command.
+		check_file_regression('\n'.join(output), file_regression)
 
-        .. program:: foobar
-        .. code-block:: shell
-
-            foobar [OPTIONS] ARG
-
-        .. rubric:: Options
-
-        .. option:: --param <param>
-
-            A sample option
-
-        .. option:: --another <FOO>
-
-            Another option
-
-        .. option:: --choice <choice>
-
-            A sample option with choices
-
-            :options: Option1 | Option2
-
-        .. rubric:: Arguments
-
-        .. option:: ARG
-
-            Required argument.
-
-        .. rubric:: Environment variables
-
-        .. _foobar-param-PARAM:
-
-        .. envvar:: PARAM
-           :noindex:
-
-            Provide a default for :option:`--param`
-
-        .. _foobar-arg-ARG:
-
-        .. envvar:: ARG
-           :noindex:
-
-            Provide a default for :option:`ARG`
-        """
-						).lstrip() == '\n'.join(output)
-
-	def test_help_epilog(self):
+	def test_help_epilog(self, file_regression: FileRegressionFixture):
 		"""
 		Validate formatting of explicit help and epilog strings.
 		"""
@@ -126,26 +74,9 @@ class TestCommand:
 		ctx = click.Context(foobar, info_name="foobar")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-		assert textwrap.dedent(
-						"""
-        A sample command.
+		check_file_regression('\n'.join(output), file_regression)
 
-        .. program:: foobar
-        .. code-block:: shell
-
-            foobar [OPTIONS]
-
-        .. rubric:: Options
-
-        .. option:: --param <param>
-
-            A sample option
-
-        A sample epilog.
-        """
-						).lstrip() == '\n'.join(output)
-
-	def test_defaults(self):
+	def test_defaults(self, file_regression: FileRegressionFixture):
 		"""
 		Validate formatting of user documented defaults.
 		"""
@@ -165,26 +96,7 @@ class TestCommand:
 		ctx = click.Context(foobar, info_name="foobar")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-		assert textwrap.dedent(
-						"""
-        A sample command.
-
-        .. program:: foobar
-        .. code-block:: shell
-
-            foobar [OPTIONS]
-
-        .. rubric:: Options
-
-        .. option:: --num-param <num_param>
-
-            :default: 42
-
-        .. option:: --param <param>
-
-            :default: Something computed at runtime
-        """
-						).lstrip() == '\n'.join(output)
+		check_file_regression('\n'.join(output), file_regression)
 
 	def test_hidden(self):
 		"""
@@ -200,9 +112,9 @@ class TestCommand:
 		ctx = click.Context(foobar, info_name="foobar")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-		assert '' ==  '\n'.join(output)
+		assert '' == '\n'.join(output)
 
-	def test_titles(self):
+	def test_titles(self, file_regression: FileRegressionFixture):
 		"""
 		Validate a `click.Command` with nested titles.
 		"""
@@ -224,29 +136,7 @@ class TestCommand:
 		ctx = click.Context(hello, info_name="hello")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-		assert textwrap.dedent(
-						"""
-        Prints hello to name given.
-
-        Examples
-        --------
-
-        .. code:: bash
-
-                my_cli hello --name "Jack"
-
-        .. program:: hello
-        .. code-block:: shell
-
-            hello [OPTIONS]
-
-        .. rubric:: Options
-
-        .. option:: --name <name>
-
-            **Required** Name to say hello to.
-        """
-						).lstrip() == '\n'.join(output)
+		check_file_regression('\n'.join(output), file_regression)
 
 
 class TestGroup:
@@ -254,7 +144,7 @@ class TestGroup:
 	Validate basic ``click.Group`` instances.
 	"""
 
-	def test_no_parameters(self):
+	def test_no_parameters_group(self, file_regression: FileRegressionFixture):
 		"""Validate a `click.Group` with no parameters.
 
 		This exercises the code paths for a group with *no* arguments, *no*
@@ -270,18 +160,9 @@ class TestGroup:
 		ctx = click.Context(cli, info_name="cli")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-		assert textwrap.dedent(
-						"""
-        A sample command group.
+		check_file_regression('\n'.join(output), file_regression)
 
-        .. program:: cli
-        .. code-block:: shell
-
-            cli [OPTIONS] COMMAND [ARGS]...
-        """
-						).lstrip() == '\n'.join(output)
-
-	def test_basic_parameters(self):
+	def test_basic_parameters_group(self, file_regression: FileRegressionFixture):
 		"""
 		Validate a combination of parameters.
 
@@ -300,51 +181,14 @@ class TestGroup:
 		ctx = click.Context(cli, info_name="cli")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-		assert textwrap.dedent(
-						"""
-        A sample command group.
+		check_file_regression('\n'.join(output), file_regression)
 
-        .. program:: cli
-        .. code-block:: shell
-
-            cli [OPTIONS] ARG COMMAND [ARGS]...
-
-        .. rubric:: Options
-
-        .. option:: --param <param>
-
-            A sample option
-
-        .. rubric:: Arguments
-
-        .. option:: ARG
-
-            Required argument.
-
-        .. rubric:: Environment variables
-
-        .. _cli-param-PARAM:
-
-        .. envvar:: PARAM
-           :noindex:
-
-            Provide a default for :option:`--param`
-
-        .. _cli-arg-ARG:
-
-        .. envvar:: ARG
-           :noindex:
-
-            Provide a default for :option:`ARG`
-        """
-						).lstrip() == '\n'.join(output)
-
-	def test_no_line_wrapping(self):
+	def test_no_line_wrapping(self, file_regression: FileRegressionFixture):
 		r"""
 		Validate behavior when a \b character is present.
 
 		https://click.palletsprojects.com/en/7.x/documentation/#preventing-rewrapping
-        """
+		"""
 
 		@click.group()
 		def cli():
@@ -363,23 +207,7 @@ class TestGroup:
 		ctx = click.Context(cli, info_name="cli")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-		assert textwrap.dedent(
-						"""
-        A sample command group.
-
-        | This is
-        | a paragraph
-        | without rewrapping.
-
-        And this is a paragraph
-        that will be rewrapped again.
-
-        .. program:: cli
-        .. code-block:: shell
-
-            cli [OPTIONS] COMMAND [ARGS]...
-        """
-						).lstrip() == '\n'.join(output)
+		check_file_regression('\n'.join(output), file_regression)
 
 
 class TestNestedCommands:
@@ -406,7 +234,7 @@ class TestNestedCommands:
 
 		return click.Context(cli, info_name="cli")
 
-	def test_nested_short(self):
+	def test_nested_short(self, file_regression: FileRegressionFixture):
 		"""
 		Validate a nested command with 'nested' of 'short' (default).
 
@@ -417,24 +245,9 @@ class TestNestedCommands:
 		ctx = self._get_ctx()
 		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-		assert textwrap.dedent(
-						"""
-        A sample command group.
+		check_file_regression('\n'.join(output), file_regression)
 
-        .. program:: cli
-        .. code-block:: shell
-
-            cli [OPTIONS] COMMAND [ARGS]...
-
-        .. rubric:: Commands
-
-        .. object:: hello
-
-            A sample command.
-        """
-						).lstrip() == '\n'.join(output)
-
-	def test_nested_full(self):
+	def test_nested_full(self, file_regression: FileRegressionFixture):
 		"""
 		Validate a nested command with 'nested' of 'full'.
 
@@ -444,18 +257,9 @@ class TestNestedCommands:
 		ctx = self._get_ctx()
 		output = list(sphinx_click._format_command(ctx, nested="full"))
 
-		assert textwrap.dedent(
-						"""
-        A sample command group.
+		check_file_regression('\n'.join(output), file_regression)
 
-        .. program:: cli
-        .. code-block:: shell
-
-            cli [OPTIONS] COMMAND [ARGS]...
-        """
-						).lstrip() == '\n'.join(output)
-
-	def test_nested_none(self):
+	def test_nested_none(self, file_regression: FileRegressionFixture):
 		"""
 		Validate a nested command with 'nested' of 'none'.
 
@@ -465,16 +269,7 @@ class TestNestedCommands:
 		ctx = self._get_ctx()
 		output = list(sphinx_click._format_command(ctx, nested="none"))
 
-		assert textwrap.dedent(
-						"""
-        A sample command group.
-
-        .. program:: cli
-        .. code-block:: shell
-
-            cli [OPTIONS] COMMAND [ARGS]...
-        """
-						).lstrip() == '\n'.join(output)
+		check_file_regression('\n'.join(output), file_regression)
 
 
 class TestCommandFilter:
@@ -505,7 +300,7 @@ class TestCommandFilter:
 
 		return click.Context(cli, info_name="cli")
 
-	def test_no_commands(self):
+	def test_no_commands(self, file_regression: FileRegressionFixture):
 		"""
 		Validate an empty command group.
 		"""
@@ -513,18 +308,9 @@ class TestCommandFilter:
 		ctx = self._get_ctx()
 		output = list(sphinx_click._format_command(ctx, nested="short", commands=''))
 
-		assert textwrap.dedent(
-						"""
-        A sample command group.
+		check_file_regression('\n'.join(output), file_regression)
 
-        .. program:: cli
-        .. code-block:: shell
-
-            cli [OPTIONS] COMMAND [ARGS]...
-        """
-						).lstrip() == '\n'.join(output)
-
-	def test_order_of_commands(self):
+	def test_order_of_commands(self, file_regression: FileRegressionFixture):
 		"""
 		Validate the order of commands.
 		"""
@@ -532,26 +318,7 @@ class TestCommandFilter:
 		ctx = self._get_ctx()
 		output = list(sphinx_click._format_command(ctx, nested="short", commands="world, hello"))
 
-		assert textwrap.dedent(
-						"""
-        A sample command group.
-
-        .. program:: cli
-        .. code-block:: shell
-
-            cli [OPTIONS] COMMAND [ARGS]...
-
-        .. rubric:: Commands
-
-        .. object:: world
-
-            A world command.
-
-        .. object:: hello
-
-            A sample command.
-        """
-						).lstrip() == '\n'.join(output)
+		check_file_regression('\n'.join(output), file_regression)
 
 
 class TestCustomMultiCommand:
@@ -559,7 +326,7 @@ class TestCustomMultiCommand:
 	Validate ``click.MultiCommand`` instances.
 	"""
 
-	def test_basics(self):
+	def test_basics(self, file_regression: FileRegressionFixture):
 		"""
 		Validate a custom ``click.MultiCommand`` with no parameters.
 
@@ -595,28 +362,9 @@ class TestCustomMultiCommand:
 		ctx = click.Context(cli, info_name="cli")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
 
-		assert textwrap.dedent(
-						"""
-        A sample custom multicommand.
+		check_file_regression('\n'.join(output), file_regression)
 
-        .. program:: cli
-        .. code-block:: shell
-
-            cli [OPTIONS] COMMAND [ARGS]...
-
-        .. rubric:: Commands
-
-        .. object:: hello
-
-            A sample command.
-
-        .. object:: world
-
-            A world command.
-        """
-						).lstrip() == '\n'.join(output)
-
-	def test_hidden(self):
+	def test_hidden(self, file_regression: FileRegressionFixture):
 		"""
 		Ensure 'hidden' subcommands are not shown.
 		"""
@@ -657,23 +405,4 @@ class TestCustomMultiCommand:
 		output = list(sphinx_click._format_command(ctx, nested="short"))
 
 		# Note that we do NOT expect this to show the 'hidden' command
-		assert textwrap.dedent(
-						"""
-        A sample custom multicommand.
-
-        .. program:: cli
-        .. code-block:: shell
-
-            cli [OPTIONS] COMMAND [ARGS]...
-
-        .. rubric:: Commands
-
-        .. object:: hello
-
-            A sample command.
-
-        .. object:: world
-
-            A world command.
-        """
-						).lstrip() == '\n'.join(output)
+		check_file_regression('\n'.join(output), file_regression)
