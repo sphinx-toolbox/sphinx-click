@@ -50,7 +50,6 @@ class TestCommand:
 			"""
 			A sample command.
 			"""
-			pass
 
 		ctx = click.Context(foobar, info_name="foobar")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
@@ -104,7 +103,6 @@ class TestCommand:
 
 		ctx = click.Context(foobar, info_name="foobar")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
-
 		assert '' == '\n'.join(output)
 
 	def test_titles(self, file_regression: FileRegressionFixture):
@@ -124,7 +122,7 @@ class TestCommand:
 			.. code:: bash
 
 				my_cli hello --name "Jack"
-            """
+			"""
 
 		ctx = click.Context(hello, info_name="hello")
 		output = list(sphinx_click._format_command(ctx, nested="short"))
@@ -212,14 +210,12 @@ class TestNestedCommands:
 			"""
 			A sample command group.
 			"""
-			pass
 
 		@cli.command()
 		def hello():
 			"""
 			A sample command.
 			"""
-			pass
 
 		return click.Context(cli, info_name="cli")
 
@@ -314,8 +310,7 @@ class TestCustomMultiCommand:
 		"""
 		Validate a custom ``click.MultiCommand`` with no parameters.
 
-		This exercises the code paths to extract commands correctly from these
-		commands.
+		This exercises the code paths to extract commands correctly from these commands.
 		"""
 
 		@click.command()
