@@ -4,7 +4,7 @@ sphinx-click
 
 .. start short_desc
 
-**Sphinx extension that automatically documents click applications**
+**Sphinx extension that automatically documents click applications.**
 
 .. end short_desc
 

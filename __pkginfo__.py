@@ -23,7 +23,7 @@ __all__ = [
 		]
 
 __copyright__ = """
-2020 Dominic Davis-Foster <dominic@davis-foster.co.uk>
+2017 Stephen Finucane <stephen@that.guru>
 """
 
 __version__ = "0.0.0"
