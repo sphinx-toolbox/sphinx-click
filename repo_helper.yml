@@ -1,0 +1,20 @@
+# Configuration for 'repo_helper' (https://github.com/domdfcoding/repo_helper)
+---
+modname: 'sphinx-click'
+copyright_years: '2020'
+author: 'Dominic Davis-Foster'
+email: 'dominic@davis-foster.co.uk'
+username: 'domdfcoding'
+version: '0.0.0'
+license: 'MIT'
+short_desc: 'Sphinx extension that automatically documents click applications.'
+
+enable_conda: false
+enable_docs: False
+on_pypi: False
+
+python_versions:
+ - 3.6
+ - 3.7
+ - 3.8
+ - 3.9
