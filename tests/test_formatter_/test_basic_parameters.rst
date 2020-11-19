@@ -34,11 +34,11 @@ A sample command.
 .. envvar:: PARAM
    :noindex:
 
-    Provide a default for :option:`--param`
+    Provides a default for :option:`--param`
 
 .. _foobar-arg-ARG:
 
 .. envvar:: ARG
    :noindex:
 
-    Provide a default for :option:`ARG`
+    Provides a default for :option:`ARG`

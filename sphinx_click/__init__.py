@@ -247,7 +247,7 @@ def _format_envvar(param):
 		# first. For example, if '--foo' or '-f' are possible, use '--foo'.
 		param_ref = param.opts[0]
 
-	yield _indent(f'Provide a default for :option:`{param_ref}`')
+	yield _indent(f'Provides a default for :option:`{param_ref}`')
 
 
 def _format_envvars(ctx):
@@ -450,7 +450,7 @@ class ClickDirective(SphinxDirective):
 		view = ViewList(content)
 
 		click_node = nodes.paragraph(rawsource='\n'.join(content))
-		self.state.nested_parse(view, self.content_offset, click_node)  # type: ignore
+		self.state.nested_parse(view, self.content_offset, click_node)
 
 		click_purger.add_node(self.env, click_node, targetnode, self.lineno)
 
