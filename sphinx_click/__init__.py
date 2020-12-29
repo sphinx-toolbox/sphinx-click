@@ -32,8 +32,6 @@ Sphinx extension that automatically documents click applications.
 import traceback
 import warnings
 from collections import Iterable
-from functools import partial
-from gettext import ngettext
 
 # 3rd party
 import click
@@ -41,6 +39,7 @@ from docutils import nodes, statemachine
 from docutils.parsers.rst import directives
 from docutils.statemachine import ViewList
 from domdf_python_tools.stringlist import DelimitedList
+from domdf_python_tools.words import Plural
 from sphinx.application import Sphinx
 from sphinx.util.docutils import SphinxDirective
 from sphinx_toolbox.utils import Purger
@@ -58,7 +57,7 @@ NESTED_SHORT = "short"
 NESTED_NONE = "none"
 
 click_purger = Purger("all_click")
-_argument = partial(ngettext, "argument", "argument(s)")
+_argument = Plural("argument", "argument(s)")
 
 
 def _indent(text, level=1):
