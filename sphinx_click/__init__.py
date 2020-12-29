@@ -31,7 +31,7 @@ Sphinx extension that automatically documents click applications.
 # stdlib
 import traceback
 import warnings
-from collections import Iterable
+from typing import Iterable
 
 # 3rd party
 import click
