@@ -249,9 +249,7 @@ def _format_envvar(param):
 	if isinstance(param, click.Argument):
 		param_ref = param.human_readable_name
 	else:
-		# if a user has defined an opt with multiple "aliases", always use the
-		# first. For example, if '--foo' or '-f' are possible, use '--foo'.
-		param_ref = param.opts[0]
+		param_ref = " / ".join(param.opts)
 
 	yield _indent(f"Provides a default for :option:`{param_ref}`")
 
