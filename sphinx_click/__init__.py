@@ -82,7 +82,8 @@ def _get_usage(ctx):
 
 
 def _get_help_record(opt):
-	"""Re-implementation of click.Opt.get_help_record.
+	"""
+	Re-implementation of :meth:`click.Option.get_help_record`.
 
 	The variant of 'get_help_record' found in Click makes uses of slashes to
 	separate multiple opts, and formats option arguments using upper case. This
@@ -121,11 +122,11 @@ def _get_help_record(opt):
 
 	if opt.default is not None and opt.show_default:
 		if isinstance(opt.show_default, str):
-			# Starting from Click 7.0 this can be a string as well. This is
-			# mostly useful when the default is not a constant and
+			# Starting from Click 7.0 this can be a string as well.
+			# This is mostly useful when the default is not a constant and
 			# documentation thus needs a manually written string.
-			extras.append(":default: %s" % opt.show_default)
-		elif isinstance(opt.default, Iterable):
+			extras.append(f":default: {opt.show_default}")
+		elif isinstance(opt.default, Iterable) and not isinstance(opt.default, str):
 			extras.append(f":default: {DelimitedList(opt.default):, }")
 		else:
 			extras.append(f":default: {opt.default}")
@@ -200,7 +201,7 @@ def _format_option(opt):
 
 def _format_options(ctx):
 	"""
-	Format all `click.Option` for a `click.Command`.
+	Format all :class:`click.Option` for a :class:`click.Command`.
 	"""
 
 	params = [param for param in ctx.command.params if isinstance(param, click.Option) and not param.hidden]
@@ -212,7 +213,7 @@ def _format_options(ctx):
 
 def _format_argument(arg):
 	"""
-	Format the output of a `click.Argument`.
+	Format the output of a :class:`click.Argument`.
 	"""
 
 	yield f".. option:: {arg.human_readable_name}"
@@ -256,7 +257,7 @@ def _format_envvar(param):
 
 def _format_envvars(ctx):
 	"""
-	Format all envvars for a `click.Command`.
+	Format all envvars for a :class:`click.Command`.
 	"""
 
 	params = [x for x in ctx.command.params if getattr(x, "envvar")]
@@ -270,7 +271,7 @@ def _format_envvars(ctx):
 
 def _format_subcommand(command):
 	"""
-	Format a sub-command of a `click.Command` or `click.Group`.
+	Format a sub-command of a :class:`click.Command` or :class:`click.Group`.
 	"""
 
 	yield f'.. object:: {command.name}'
@@ -420,7 +421,8 @@ class ClickDirective(SphinxDirective):
 			}
 
 	def _generate_nodes(self, name, command, parent, nested, commands=None):
-		"""Generate the relevant Sphinx nodes.
+		"""
+		Generate the relevant Sphinx nodes.
 
 		Format a :class:`click.Group` or :class:`click.Command`.
 
