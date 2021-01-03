@@ -517,7 +517,7 @@ class ClickDirective(SphinxDirective):
 
 
 def env_get_outdated(app, env, added, changed, removed):
-	return [node["docname"] for node in getattr(env, click_purger.attr_name)]
+	return [node["docname"] for node in getattr(env, click_purger.attr_name, ())]
 
 
 def setup(app: Sphinx) -> None:
