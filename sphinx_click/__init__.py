@@ -5,7 +5,7 @@
 Sphinx extension that automatically documents click applications.
 """
 #
-#  Copyright © 2020 Dominic Davis-Foster <dominic@davis-foster.co.uk>
+#  Copyright © 2020-2021 Dominic Davis-Foster <dominic@davis-foster.co.uk>
 #  Based on https://github.com/click-contrib/sphinx-click
 #  Copyright (c) 2017 Stephen Finucane http://that.guru/
 #
@@ -45,7 +45,7 @@ from sphinx.util.docutils import SphinxDirective
 from sphinx_toolbox.utils import Purger
 
 __author__: str = "Dominic Davis-Foster"
-__copyright__: str = "2020 Dominic Davis-Foster"
+__copyright__: str = "2020-2021 Dominic Davis-Foster"
 __license__: str = "MIT License"
 __version__: str = "0.0.0"
 __email__: str = "dominic@davis-foster.co.uk"
@@ -247,12 +247,15 @@ def _format_envvar(param):
 	yield "   :noindex:"
 	yield ''
 
-	if isinstance(param, click.Argument):
-		param_ref = param.human_readable_name
-	else:
-		param_ref = " / ".join(param.opts)
+	# TODO: Provide a role to link to the option that accepts slashes
+	#  Or replace the option directive entirely?
+	#  That would allow linking to the option of a specific command.
 
-	yield _indent(f"Provides a default for :option:`{param_ref}`")
+	if isinstance(param, click.Argument):
+		yield _indent(f"Provides a default for :option:`{param.human_readable_name}`")
+	else:
+		param_ref = DelimitedList(param.opts)
+		yield _indent(f"Provides a default for :option:`{param_ref: / } <{param_ref[0]}>`")
 
 
 def _format_envvars(ctx):
