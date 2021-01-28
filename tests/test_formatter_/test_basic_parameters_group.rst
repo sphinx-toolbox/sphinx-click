@@ -24,7 +24,7 @@ A sample command group.
 .. envvar:: PARAM
    :noindex:
 
-    Provides a default for :option:`--param`
+    Provides a default for :option:`--param <--param>`
 
 .. _cli-arg-ARG:
 

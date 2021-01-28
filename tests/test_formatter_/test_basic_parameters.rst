@@ -34,7 +34,7 @@ A sample command.
 .. envvar:: PARAM
    :noindex:
 
-    Provides a default for :option:`--param`
+    Provides a default for :option:`--param <--param>`
 
 .. _foobar-arg-ARG:
 
