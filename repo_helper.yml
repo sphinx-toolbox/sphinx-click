@@ -24,3 +24,5 @@ classifiers:
  - "Environment :: Console"
  - "Intended Audience :: Developers"
  - "Intended Audience :: Information Technology"
+
+min_coverage: 75
