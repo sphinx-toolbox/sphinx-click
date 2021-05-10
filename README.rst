@@ -20,7 +20,7 @@ sphinx-click
 	* - Activity
 	  - |commits-latest| |commits-since| |maintained|
 	* - QA
-	  - |codefactor| |actions_flake8| |actions_mypy| |pre_commit_ci|
+	  - |codefactor| |actions_flake8| |actions_mypy|
 	* - Other
 	  - |license| |language| |requires|
 
@@ -73,10 +73,6 @@ sphinx-click
 
 .. |maintained| image:: https://img.shields.io/maintenance/yes/2021
 	:alt: Maintenance
-
-.. |pre_commit_ci| image:: https://results.pre-commit.ci/badge/github/domdfcoding/sphinx-click/master.svg
-	:target: https://results.pre-commit.ci/latest/github/domdfcoding/sphinx-click/master
-	:alt: pre-commit.ci status
 
 .. end shields
 
