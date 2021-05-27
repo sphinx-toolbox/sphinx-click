@@ -32,6 +32,7 @@ Sphinx extension that automatically documents click applications.
 import enum
 import traceback
 import warnings
+from operator import attrgetter
 from typing import Iterable, Optional, Tuple
 
 # 3rd party
@@ -166,8 +167,11 @@ def _format_description(ctx: click.Context):
 			continue
 		if line == '':
 			bar_enabled = False
-		line = "| " + line if bar_enabled else line
-		yield line
+
+		if bar_enabled:
+			yield f"| {line}"
+		else:
+			yield line
 
 	yield ''
 
@@ -246,7 +250,7 @@ def _format_envvar(param):
 	"""
 
 	yield f'.. envvar:: {param.envvar}'
-	yield "   :noindex:"
+	yield "    :noindex:"
 	yield ''
 
 	# TODO: Provide a role to link to the option that accepts slashes
@@ -310,8 +314,8 @@ def _format_epilog(ctx: click.Context):
 def _get_lazyload_commands(multicommand: click.MultiCommand):
 	commands = {}
 
-	for command in multicommand.list_commands(multicommand):
-		commands[command] = multicommand.get_command(multicommand, command)
+	for command in multicommand.list_commands(multicommand):  # type: ignore
+		commands[command] = multicommand.get_command(multicommand, command)  # type: ignore
 
 	return commands
 
@@ -327,7 +331,7 @@ def _filter_commands(ctx: click.Context, commands=None):
 		lookup = _get_lazyload_commands(ctx.command)
 
 	if commands is None:
-		return sorted(lookup.values(), key=lambda item: item.name)
+		return sorted(lookup.values(), key=attrgetter("name"))
 
 	names = [name.strip() for name in commands.split(',')]
 
@@ -446,7 +450,7 @@ class ClickDirective(SphinxDirective):
 
 		# Summary
 		ctx = click.Context(command, info_name=name, parent=parent)
-		content = list(self._format_command(ctx, nested, commands))
+		content = list(_format_command(ctx, nested, commands))
 
 		view = ViewList(content)
 		click_node = nodes.paragraph(rawsource='\n'.join(content))
