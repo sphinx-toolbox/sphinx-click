@@ -15,6 +15,9 @@ name = 'Dominic Davis-Foster"'
 email = "dominic@davis-foster.co.uk"
 
 
+[dep_checker]
+allowed_unused = [ "jinja2", "markupsafe",]
+
 [project.license]
 file = "LICENSE"
 
@@ -41,6 +44,3 @@ python-implementations = [ "CPython",]
 platforms = [ "Windows", "macOS", "Linux",]
 license-key = "MIT"
 package = "sphinx_click"
-
-[dep_checker]
-allowed_unused = ["jinja2", "markupsafe"]
