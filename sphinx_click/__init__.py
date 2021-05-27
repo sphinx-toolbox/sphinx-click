@@ -29,9 +29,10 @@ Sphinx extension that automatically documents click applications.
 #
 
 # stdlib
+import enum
 import traceback
 import warnings
-from typing import Iterable
+from typing import Iterable, Optional, Tuple
 
 # 3rd party
 import click
@@ -50,27 +51,28 @@ __license__: str = "MIT License"
 __version__: str = "0.0.0"
 __email__: str = "dominic@davis-foster.co.uk"
 
-__all__ = ["ClickDirective", "nested", "setup"]
+__all__ = ["ClickDirective", "nested_option", "setup"]
 
-NESTED_FULL = "full"
-NESTED_SHORT = "short"
-NESTED_NONE = "none"
+
+class NestedOption(str, enum.Enum):  # noqa: SLOT000
+	NESTED_FULL = "full"
+	NESTED_SHORT = "short"
+	NESTED_NONE = "none"
+
+
+NESTED_FULL = NestedOption.NESTED_FULL
+NESTED_SHORT = NestedOption.NESTED_SHORT
+NESTED_NONE = NestedOption.NESTED_NONE
 
 click_purger = Purger("all_click")
 _argument = Plural("argument", "argument(s)")
 
 
-def _indent(text, level=1):
-	prefix = ' ' * (4 * level)
-
-	def prefixed_lines():
-		for line in text.splitlines(True):
-			yield prefix + line if line.strip() else line
-
-	return ''.join(prefixed_lines())
+def _indent(text: str):
+	return '\n'.join([f"    {line}" if not line.isspace() else line for line in text.split('\n')])
 
 
-def _get_usage(ctx):
+def _get_usage(ctx: click.Context):
 	"""
 	Alternative, non-prefixed version of 'get_usage'.
 	"""
@@ -81,7 +83,7 @@ def _get_usage(ctx):
 	return formatter.getvalue().rstrip('\n')
 
 
-def _get_help_record(opt):
+def _get_help_record(opt: click.Option) -> Tuple[str, str]:
 	"""
 	Re-implementation of :meth:`click.Option.get_help_record`.
 
@@ -90,7 +92,7 @@ def _get_help_record(opt):
 	is not compatible with Sphinx's 'option' directive, which expects
 	comma-separated opts and option arguments surrounded by angle brackets [1].
 
-	[1] http://www.sphinx-doc.org/en/stable/domains.html#directive-option
+	[1] https://www.sphinx-doc.org/en/stable/domains.html#directive-option
 	"""
 
 	def _write_opts(opts):
@@ -143,7 +145,7 @@ def _get_help_record(opt):
 	return ", ".join(rv), '\n'.join(out)
 
 
-def _format_description(ctx):
+def _format_description(ctx: click.Context):
 	"""
 	Format the description for a given `click.Command`.
 
@@ -184,18 +186,18 @@ def _format_usage(ctx):
 	yield ''
 
 
-def _format_option(opt):
+def _format_option(opt: click.Option):
 	"""
 	Format the output for a `click.Option`.
 	"""
 
-	opt = _get_help_record(opt)
+	opt_help = _get_help_record(opt)
 
-	yield f".. option:: {opt[0]}"
+	yield f".. option:: {opt_help[0]}"
 
-	if opt[1]:
+	if opt_help[1]:
 		yield ''
-		for line in statemachine.string2lines(opt[1], tab_width=4, convert_whitespace=True):
+		for line in statemachine.string2lines(opt_help[1], tab_width=4, convert_whitespace=True):
 			yield _indent(line)
 
 
@@ -211,7 +213,7 @@ def _format_options(ctx):
 		yield ''
 
 
-def _format_argument(arg):
+def _format_argument(arg: click.Argument):
 	"""
 	Format the output of a :class:`click.Argument`.
 	"""
@@ -220,13 +222,13 @@ def _format_argument(arg):
 	yield ''
 
 	if arg.required:
-		yield _indent(f"Required {_argument(arg.nargs)}.")
+		yield f"    Required {_argument(arg.nargs)}."
 	else:
-		yield _indent(f"Optional {_argument(arg.nargs)}.")
-		yield _indent(f"Default ``{arg.default!r}``")
+		yield f"    Optional {_argument(arg.nargs)}."
+		yield f"    Default ``{arg.default!r}``"
 
 
-def _format_arguments(ctx):
+def _format_arguments(ctx: click.Context):
 	"""
 	Format all `click.Argument` for a `click.Command`.
 	"""
@@ -252,13 +254,13 @@ def _format_envvar(param):
 	#  That would allow linking to the option of a specific command.
 
 	if isinstance(param, click.Argument):
-		yield _indent(f"Provides a default for :option:`{param.human_readable_name}`")
+		yield f"    Provides a default for :option:`{param.human_readable_name}`"
 	else:
 		param_ref = DelimitedList(param.opts)
-		yield _indent(f"Provides a default for :option:`{param_ref: / } <{param_ref[0]}>`")
+		yield f"    Provides a default for :option:`{param_ref: / } <{param_ref[0]}>`"
 
 
-def _format_envvars(ctx):
+def _format_envvars(ctx: click.Context):
 	"""
 	Format all envvars for a :class:`click.Command`.
 	"""
@@ -288,7 +290,7 @@ def _format_subcommand(command):
 		yield _indent(line)
 
 
-def _format_epilog(ctx):
+def _format_epilog(ctx: click.Context):
 	"""
 	Format the epilog for a given :class:`click.Command`.
 
@@ -305,7 +307,7 @@ def _format_epilog(ctx):
 	yield ''
 
 
-def _get_lazyload_commands(multicommand):
+def _get_lazyload_commands(multicommand: click.MultiCommand):
 	commands = {}
 
 	for command in multicommand.list_commands(multicommand):
@@ -314,7 +316,7 @@ def _get_lazyload_commands(multicommand):
 	return commands
 
 
-def _filter_commands(ctx, commands=None):
+def _filter_commands(ctx: click.Context, commands=None):
 	"""
 	Return list of used commands.
 	"""
@@ -332,7 +334,7 @@ def _filter_commands(ctx, commands=None):
 	return [lookup[name] for name in names if name in lookup]
 
 
-def _format_command(ctx, nested, commands=None):
+def _format_command(ctx: click.Context, nested: NestedOption, commands=None):
 	"""
 	Format the output of :class:`click.Command`.
 	"""
@@ -360,25 +362,25 @@ def _format_command(ctx, nested, commands=None):
 
 	# arguments
 	lines = list(_format_arguments(ctx))
+
 	if lines:
 		yield ".. rubric:: Arguments"
 		yield ''
-
-	yield from lines
+		yield from lines
 
 	# environment variables
 	lines = list(_format_envvars(ctx))
+
 	if lines:
 		yield ".. rubric:: Environment variables"
 		yield ''
-
-	yield from lines
+		yield from lines
 
 	# description
 	yield from _format_epilog(ctx)
 
 	# if we're nesting commands, we need to do this slightly differently
-	if nested in (NESTED_FULL, NESTED_NONE):
+	if nested in (NestedOption.NESTED_FULL, NestedOption.NESTED_NONE):
 		return
 
 	commands = _filter_commands(ctx, commands)
@@ -389,14 +391,12 @@ def _format_command(ctx, nested, commands=None):
 
 	for command in commands:
 		# Don't show hidden subcommands
-		if command.hidden:
-			continue
-
-		yield from _format_subcommand(command)
-		yield ''
+		if not command.hidden:
+			yield from _format_subcommand(command)
+			yield ''
 
 
-def nested(argument):  # noqa: D103
+def nested_option(argument: str) -> Optional[str]:  # noqa: D103
 	if not argument:
 		return None
 
@@ -418,7 +418,7 @@ class ClickDirective(SphinxDirective):
 	required_arguments = 1
 	option_spec = {
 			"prog": directives.unchanged_required,
-			"nested": nested,
+			"nested": nested_option,
 			"commands": directives.unchanged,
 			"show-nested": directives.flag,
 			}
@@ -444,16 +444,11 @@ class ClickDirective(SphinxDirective):
 		targetid = f"click-{self.env.new_serialno('click'):d}"
 		targetnode = nodes.target('', '', ids=[targetid])
 
-		content = []
-		ctx = click.Context(command, info_name=name, parent=parent)
-
 		# Summary
-		lines = _format_command(ctx, nested, commands)
-		for line in lines:
-			content.append(line)
+		ctx = click.Context(command, info_name=name, parent=parent)
+		content = list(self._format_command(ctx, nested, commands))
 
 		view = ViewList(content)
-
 		click_node = nodes.paragraph(rawsource='\n'.join(content))
 		self.state.nested_parse(view, self.content_offset, click_node)
 
@@ -512,7 +507,7 @@ class ClickDirective(SphinxDirective):
 						"':show-nested:' is deprecated; use ':nested: full'",
 						DeprecationWarning,
 						)
-				nested = NESTED_FULL if show_nested else NESTED_SHORT
+				nested = NestedOption.NESTED_FULL if show_nested else NESTED_SHORT
 
 		commands = self.options.get("commands")
 

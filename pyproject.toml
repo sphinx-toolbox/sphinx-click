@@ -1,6 +1,6 @@
 [build-system]
-requires = [ "setuptools>=40.6.0", "wheel>=0.34.2",]
-build-backend = "setuptools.build_meta"
+requires = [ "whey",]
+build-backend = "whey"
 
 [project]
 name = "sphinx-click"
@@ -11,21 +11,9 @@ keywords = []
 dynamic = [ "requires-python", "classifiers", "dependencies",]
 
 [[project.authors]]
-name = "Stephen Finucane, Dominic Davis-Foster"
+name = 'Dominic Davis-Foster"'
 email = "dominic@davis-foster.co.uk"
 
-
-[tool.black]
-line-length = 88
-target-version = [ "py36",]
-skip-string-normalization = true
-exclude = "(\n  /(\n      \\.eggs\n    | \\.git\n    | \\.tox\n    | \\.venv\n    | build\n    | dist\n  )\n)\n"
-
-[tool.mkrecipe]
-conda-channels = [ "domdfcoding",]
-extras = "all"
-license-key = "MIT"
-package = "sphinx_click"
 
 [project.license]
 file = "LICENSE"
@@ -34,3 +22,25 @@ file = "LICENSE"
 Homepage = "https://github.com/domdfcoding/sphinx-click"
 "Issue Tracker" = "https://github.com/domdfcoding/sphinx-click/issues"
 "Source Code" = "https://github.com/domdfcoding/sphinx-click"
+
+[tool.mkrecipe]
+conda-channels = [ "domdfcoding",]
+extras = "all"
+license-key = "MIT"
+package = "sphinx_click"
+
+[tool.whey]
+base-classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+]
+python-versions = [ "3.6", "3.7", "3.8", "3.9",]
+python-implementations = [ "CPython",]
+platforms = [ "Windows", "macOS", "Linux",]
+license-key = "MIT"
+package = "sphinx_click"
+
+[dep_checker]
+allowed_unused = ["jinja2", "markupsafe"]

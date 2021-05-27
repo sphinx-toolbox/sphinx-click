@@ -1,7 +1,6 @@
 # 3rd party
 import click
-from coincidence import check_file_regression
-from pytest_regressions.file_regression import FileRegressionFixture
+from coincidence.regressions import AdvancedFileRegressionFixture
 
 # this package
 import sphinx_click
@@ -12,8 +11,9 @@ class TestCommand:
 	Validate basic ``click.Command`` instances.
 	"""
 
-	def test_no_parameters(self, file_regression: FileRegressionFixture):
-		"""Validate a `click.Command` with no parameters.
+	def test_no_parameters(self, advanced_file_regression: AdvancedFileRegressionFixture):
+		"""
+		Validate a `click.Command` with no parameters.
 
 		This exercises the code paths for a command with *no* arguments, *no*
 		options and *no* environment variables.
@@ -26,10 +26,10 @@ class TestCommand:
 			"""
 
 		ctx = click.Context(foobar, info_name="foobar")
-		output = list(sphinx_click._format_command(ctx, nested="short"))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
-	def test_basic_parameters(self, file_regression: FileRegressionFixture):
+	def test_basic_parameters(self, advanced_file_regression: AdvancedFileRegressionFixture):
 		"""
 		Validate a combination of parameters.
 
@@ -52,10 +52,10 @@ class TestCommand:
 			"""
 
 		ctx = click.Context(foobar, info_name="foobar")
-		output = list(sphinx_click._format_command(ctx, nested="short"))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
-	def test_help_epilog(self, file_regression: FileRegressionFixture):
+	def test_help_epilog(self, advanced_file_regression: AdvancedFileRegressionFixture):
 		"""
 		Validate formatting of explicit help and epilog strings.
 		"""
@@ -66,10 +66,10 @@ class TestCommand:
 			pass
 
 		ctx = click.Context(foobar, info_name="foobar")
-		output = list(sphinx_click._format_command(ctx, nested="short"))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
-	def test_defaults(self, file_regression: FileRegressionFixture):
+	def test_defaults(self, advanced_file_regression: AdvancedFileRegressionFixture):
 		"""
 		Validate formatting of user documented defaults.
 		"""
@@ -87,8 +87,8 @@ class TestCommand:
 			"""
 
 		ctx = click.Context(foobar, info_name="foobar")
-		output = list(sphinx_click._format_command(ctx, nested="short"))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
 	def test_hidden(self):
 		"""
@@ -102,10 +102,10 @@ class TestCommand:
 			"""
 
 		ctx = click.Context(foobar, info_name="foobar")
-		output = list(sphinx_click._format_command(ctx, nested="short"))
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT))
 		assert '' == '\n'.join(output)
 
-	def test_titles(self, file_regression: FileRegressionFixture):
+	def test_titles(self, advanced_file_regression: AdvancedFileRegressionFixture):
 		"""
 		Validate a `click.Command` with nested titles.
 		"""
@@ -125,8 +125,8 @@ class TestCommand:
 			"""
 
 		ctx = click.Context(hello, info_name="hello")
-		output = list(sphinx_click._format_command(ctx, nested="short"))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
 
 class TestGroup:
@@ -134,8 +134,9 @@ class TestGroup:
 	Validate basic ``click.Group`` instances.
 	"""
 
-	def test_no_parameters_group(self, file_regression: FileRegressionFixture):
-		"""Validate a `click.Group` with no parameters.
+	def test_no_parameters_group(self, advanced_file_regression: AdvancedFileRegressionFixture):
+		"""
+		Validate a `click.Group` with no parameters.
 
 		This exercises the code paths for a group with *no* arguments, *no*
 		options and *no* environment variables.
@@ -148,10 +149,10 @@ class TestGroup:
 			"""
 
 		ctx = click.Context(cli, info_name="cli")
-		output = list(sphinx_click._format_command(ctx, nested="short"))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
-	def test_basic_parameters_group(self, file_regression: FileRegressionFixture):
+	def test_basic_parameters_group(self, advanced_file_regression: AdvancedFileRegressionFixture):
 		"""
 		Validate a combination of parameters.
 
@@ -168,10 +169,10 @@ class TestGroup:
 			"""
 
 		ctx = click.Context(cli, info_name="cli")
-		output = list(sphinx_click._format_command(ctx, nested="short"))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
-	def test_no_line_wrapping(self, file_regression: FileRegressionFixture):
+	def test_no_line_wrapping(self, advanced_file_regression: AdvancedFileRegressionFixture):
 		r"""
 		Validate behavior when a \b character is present.
 
@@ -193,8 +194,8 @@ class TestGroup:
 			"""
 
 		ctx = click.Context(cli, info_name="cli")
-		output = list(sphinx_click._format_command(ctx, nested="short"))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
 
 class TestNestedCommands:
@@ -219,7 +220,7 @@ class TestNestedCommands:
 
 		return click.Context(cli, info_name="cli")
 
-	def test_nested_short(self, file_regression: FileRegressionFixture):
+	def test_nested_short(self, advanced_file_regression: AdvancedFileRegressionFixture):
 		"""
 		Validate a nested command with 'nested' of 'short' (default).
 
@@ -228,10 +229,10 @@ class TestNestedCommands:
 		"""
 
 		ctx = self._get_ctx()
-		output = list(sphinx_click._format_command(ctx, nested="short"))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
-	def test_nested_full(self, file_regression: FileRegressionFixture):
+	def test_nested_full(self, advanced_file_regression: AdvancedFileRegressionFixture):
 		"""
 		Validate a nested command with 'nested' of 'full'.
 
@@ -239,10 +240,10 @@ class TestNestedCommands:
 		"""
 
 		ctx = self._get_ctx()
-		output = list(sphinx_click._format_command(ctx, nested="full"))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_FULL))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
-	def test_nested_none(self, file_regression: FileRegressionFixture):
+	def test_nested_none(self, advanced_file_regression: AdvancedFileRegressionFixture):
 		"""
 		Validate a nested command with 'nested' of 'none'.
 
@@ -250,8 +251,8 @@ class TestNestedCommands:
 		"""
 
 		ctx = self._get_ctx()
-		output = list(sphinx_click._format_command(ctx, nested="none"))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_NONE))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
 
 class TestCommandFilter:
@@ -282,23 +283,23 @@ class TestCommandFilter:
 
 		return click.Context(cli, info_name="cli")
 
-	def test_no_commands(self, file_regression: FileRegressionFixture):
+	def test_no_commands(self, advanced_file_regression: AdvancedFileRegressionFixture):
 		"""
 		Validate an empty command group.
 		"""
 
 		ctx = self._get_ctx()
-		output = list(sphinx_click._format_command(ctx, nested="short", commands=''))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT, commands=''))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
-	def test_order_of_commands(self, file_regression: FileRegressionFixture):
+	def test_order_of_commands(self, advanced_file_regression: AdvancedFileRegressionFixture):
 		"""
 		Validate the order of commands.
 		"""
 
 		ctx = self._get_ctx()
-		output = list(sphinx_click._format_command(ctx, nested="short", commands="world, hello"))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT, commands="world, hello"))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
 
 class TestCustomMultiCommand:
@@ -306,7 +307,7 @@ class TestCustomMultiCommand:
 	Validate ``click.MultiCommand`` instances.
 	"""
 
-	def test_basics(self, file_regression: FileRegressionFixture):
+	def test_basics(self, advanced_file_regression: AdvancedFileRegressionFixture):
 		"""
 		Validate a custom ``click.MultiCommand`` with no parameters.
 
@@ -339,10 +340,10 @@ class TestCustomMultiCommand:
 
 		cli = MyCLI(help="A sample custom multicommand.")
 		ctx = click.Context(cli, info_name="cli")
-		output = list(sphinx_click._format_command(ctx, nested="short"))
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT))
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
 
-	def test_hidden(self, file_regression: FileRegressionFixture):
+	def test_hidden(self, advanced_file_regression: AdvancedFileRegressionFixture):
 		"""
 		Ensure 'hidden' subcommands are not shown.
 		"""
@@ -380,7 +381,7 @@ class TestCustomMultiCommand:
 
 		cli = MyCLI(help="A sample custom multicommand.")
 		ctx = click.Context(cli, info_name="cli")
-		output = list(sphinx_click._format_command(ctx, nested="short"))
+		output = list(sphinx_click._format_command(ctx, nested=sphinx_click.NESTED_SHORT))
 
 		# Note that we do NOT expect this to show the 'hidden' command
-		check_file_regression('\n'.join(output), file_regression, extension=".rst")
+		advanced_file_regression.check('\n'.join(output), extension=".rst")
