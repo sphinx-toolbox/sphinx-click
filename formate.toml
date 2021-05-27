@@ -40,6 +40,8 @@ known_third_party = [
     "domdf_python_tools",
     "github",
     "importlib_metadata",
+    "jinja2",
+    "markupsafe",
     "pytest",
     "pytest_cov",
     "pytest_randomly",
