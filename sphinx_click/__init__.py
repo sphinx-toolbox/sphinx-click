@@ -225,6 +225,10 @@ def _format_argument(arg: click.Argument):
 	yield f".. option:: {arg.human_readable_name}"
 	yield ''
 
+	if getattr(arg, "description", None) is not None:
+		yield _indent(arg.description)  # type: ignore
+		yield ''
+
 	if arg.required:
 		yield f"    Required {_argument(arg.nargs)}."
 	else:
@@ -427,7 +431,14 @@ class ClickDirective(SphinxDirective):
 			"show-nested": directives.flag,
 			}
 
-	def _generate_nodes(self, name, command, parent, nested, commands=None):
+	def _generate_nodes(
+			self,
+			name: str,
+			command: click.Command,
+			parent: Optional[click.Context],
+			nested: NestedOption,
+			commands=None,
+			):
 		"""
 		Generate the relevant Sphinx nodes.
 
