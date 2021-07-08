@@ -44,7 +44,11 @@ from domdf_python_tools.stringlist import DelimitedList
 from domdf_python_tools.words import Plural
 from sphinx.application import Sphinx
 from sphinx.util.docutils import SphinxDirective
+from sphinx.writers.latex import LaTeXTranslator
 from sphinx_toolbox.utils import Purger
+
+# this package
+from sphinx_click._cmdoption import Cmdoption, OptionDesc
 
 __author__: str = "Dominic Davis-Foster"
 __copyright__: str = "2020-2021 Dominic Davis-Foster"
@@ -197,7 +201,7 @@ def _format_option(opt: click.Option):
 
 	opt_help = _get_help_record(opt)
 
-	yield f".. option:: {opt_help[0]}"
+	yield f".. cli-option:: {opt_help[0]}"
 
 	if opt_help[1]:
 		yield ''
@@ -222,7 +226,7 @@ def _format_argument(arg: click.Argument):
 	Format the output of a :class:`click.Argument`.
 	"""
 
-	yield f".. option:: {arg.human_readable_name}"
+	yield f".. cli-option:: {arg.human_readable_name}"
 	yield ''
 
 	if getattr(arg, "description", None) is not None:
@@ -541,3 +545,5 @@ def setup(app: Sphinx) -> None:
 	app.add_directive("click", ClickDirective)
 	app.connect("env-purge-doc", click_purger.purge_nodes)
 	app.connect("env-get-outdated", env_get_outdated)
+	app.add_directive("cli-option", Cmdoption)
+	app.add_node(OptionDesc, latex=(LaTeXTranslator.visit_desc, LaTeXTranslator.depart_desc), override=True)

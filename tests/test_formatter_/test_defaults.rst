@@ -7,10 +7,10 @@ A sample command.
 
 .. rubric:: Options
 
-.. option:: --num-param <num_param>
+.. cli-option:: --num-param <num_param>
 
     :default: 42
 
-.. option:: --param <param>
+.. cli-option:: --param <param>
 
     :default: Something computed at runtime

@@ -7,7 +7,7 @@ A sample command.
 
 .. rubric:: Options
 
-.. option:: --param <param>
+.. cli-option:: --param <param>
 
     A sample option
 

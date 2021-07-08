@@ -7,13 +7,13 @@ A sample command group.
 
 .. rubric:: Options
 
-.. option:: --param <param>
+.. cli-option:: --param <param>
 
     A sample option
 
 .. rubric:: Arguments
 
-.. option:: ARG
+.. cli-option:: ARG
 
     Required argument.
 
@@ -22,13 +22,13 @@ A sample command group.
 .. _cli-param-PARAM:
 
 .. envvar:: PARAM
-   :noindex:
+    :noindex:
 
     Provides a default for :option:`--param <--param>`
 
 .. _cli-arg-ARG:
 
 .. envvar:: ARG
-   :noindex:
+    :noindex:
 
     Provides a default for :option:`ARG`

@@ -7,15 +7,15 @@ A sample command.
 
 .. rubric:: Options
 
-.. option:: --param <param>
+.. cli-option:: --param <param>
 
     A sample option
 
-.. option:: --another <FOO>
+.. cli-option:: --another <FOO>
 
     Another option
 
-.. option:: --choice <choice>
+.. cli-option:: --choice <choice>
 
     A sample option with choices
 
@@ -23,7 +23,7 @@ A sample command.
 
 .. rubric:: Arguments
 
-.. option:: ARG
+.. cli-option:: ARG
 
     Required argument.
 
@@ -32,13 +32,13 @@ A sample command.
 .. _foobar-param-PARAM:
 
 .. envvar:: PARAM
-   :noindex:
+    :noindex:
 
     Provides a default for :option:`--param <--param>`
 
 .. _foobar-arg-ARG:
 
 .. envvar:: ARG
-   :noindex:
+    :noindex:
 
     Provides a default for :option:`ARG`

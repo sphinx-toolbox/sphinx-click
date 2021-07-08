@@ -14,6 +14,6 @@ Examples
 
 .. rubric:: Options
 
-.. option:: --name <name>
+.. cli-option:: --name <name>
 
     **Required** Name to say hello to.
