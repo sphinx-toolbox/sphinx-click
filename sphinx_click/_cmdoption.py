@@ -47,7 +47,7 @@ from sphinx.util.docfields import DocFieldTransformer
 __all__ = ["Cmdoption", "OptionDesc"]
 
 
-class OptionDesc(addnodes.desc):
+class OptionDesc(addnodes.desc):  # noqa: D101
 	pass
 
 
@@ -56,7 +56,7 @@ class Cmdoption(std.Cmdoption):
 	Description of a command-line option (.. option).
 	"""
 
-	def run(self) -> List[nodes.Node]:
+	def run(self) -> List[nodes.Node]:  # noqa: D102
 		if ':' in self.name:
 			self.domain, self.objtype = self.name.split(':', 1)
 		else:

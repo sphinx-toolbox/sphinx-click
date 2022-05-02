@@ -34,7 +34,7 @@ import inspect
 import traceback
 import warnings
 from operator import attrgetter
-from typing import Iterable, Optional, Tuple
+from typing import Dict, Iterable, Iterator, List, Optional, Tuple
 
 # 3rd party
 import click
@@ -46,7 +46,7 @@ from domdf_python_tools.words import Plural
 from sphinx.application import Sphinx
 from sphinx.util.docutils import SphinxDirective
 from sphinx.writers.latex import LaTeXTranslator
-from sphinx_toolbox.utils import Purger
+from sphinx_toolbox.utils import Purger, SphinxExtMetadata
 
 # this package
 from sphinx_click._cmdoption import Cmdoption, OptionDesc
@@ -78,7 +78,7 @@ def _indent(text: str):
 	return '\n'.join([f"    {line}" if not line.isspace() else line for line in text.split('\n')])
 
 
-def _get_usage(ctx: click.Context):
+def _get_usage(ctx: click.Context) -> str:
 	"""
 	Alternative, non-prefixed version of 'get_usage'.
 	"""
@@ -101,7 +101,7 @@ def _get_help_record(opt: click.Option) -> Tuple[str, str]:
 	[1] https://www.sphinx-doc.org/en/stable/domains.html#directive-option
 	"""
 
-	def _write_opts(opts):
+	def _write_opts(opts: List[str]) -> str:
 		rv, _ = click.formatting.join_options(opts)
 
 		if not opt.is_flag and not opt.count:
@@ -151,7 +151,7 @@ def _get_help_record(opt: click.Option) -> Tuple[str, str]:
 	return ", ".join(rv), '\n'.join(out)
 
 
-def _format_description(ctx: click.Context):
+def _format_description(ctx: click.Context) -> Iterator[str]:
 	"""
 	Format the description for a given `click.Command`.
 
@@ -183,7 +183,7 @@ def _format_description(ctx: click.Context):
 	yield ''
 
 
-def _format_usage(ctx):
+def _format_usage(ctx) -> Iterator[str]:
 	"""
 	Format the usage for a `click.Command`.
 	"""
@@ -197,7 +197,7 @@ def _format_usage(ctx):
 	yield ''
 
 
-def _format_option(opt: click.Option):
+def _format_option(opt: click.Option) -> Iterator[str]:
 	"""
 	Format the output for a `click.Option`.
 	"""
@@ -212,7 +212,7 @@ def _format_option(opt: click.Option):
 			yield _indent(line)
 
 
-def _format_options(ctx):
+def _format_options(ctx: click.Context) -> Iterator[str]:
 	"""
 	Format all :class:`click.Option` for a :class:`click.Command`.
 	"""
@@ -224,7 +224,7 @@ def _format_options(ctx):
 		yield ''
 
 
-def _format_argument(arg: click.Argument):
+def _format_argument(arg: click.Argument) -> Iterator[str]:
 	"""
 	Format the output of a :class:`click.Argument`.
 	"""
@@ -243,7 +243,7 @@ def _format_argument(arg: click.Argument):
 		yield f"    Default ``{arg.default!r}``"
 
 
-def _format_arguments(ctx: click.Context):
+def _format_arguments(ctx: click.Context) -> Iterator[str]:
 	"""
 	Format all `click.Argument` for a `click.Command`.
 	"""
@@ -255,7 +255,7 @@ def _format_arguments(ctx: click.Context):
 		yield ''
 
 
-def _format_envvar(param):
+def _format_envvar(param) -> Iterator[str]:
 	"""
 	Format the envvars of a `click.Option` or `click.Argument`.
 	"""
@@ -275,7 +275,7 @@ def _format_envvar(param):
 		yield f"    Provides a default for :option:`{param_ref: / } <{param_ref[0]}>`"
 
 
-def _format_envvars(ctx: click.Context):
+def _format_envvars(ctx: click.Context) -> Iterator[str]:
 	"""
 	Format all envvars for a :class:`click.Command`.
 	"""
@@ -289,7 +289,7 @@ def _format_envvars(ctx: click.Context):
 		yield ''
 
 
-def _format_subcommand(command):
+def _format_subcommand(command: click.Command) -> Iterator[str]:
 	"""
 	Format a sub-command of a :class:`click.Command` or :class:`click.Group`.
 	"""
@@ -301,11 +301,15 @@ def _format_subcommand(command):
 
 	yield ''
 
-	for line in statemachine.string2lines(command.help, tab_width=4, convert_whitespace=True):
+	for line in statemachine.string2lines(
+			inspect.cleandoc(command.help),
+			tab_width=4,
+			convert_whitespace=True,
+			):
 		yield _indent(line)
 
 
-def _format_epilog(ctx: click.Context):
+def _format_epilog(ctx: click.Context) -> Iterator[str]:
 	"""
 	Format the epilog for a given :class:`click.Command`.
 
@@ -322,7 +326,7 @@ def _format_epilog(ctx: click.Context):
 	yield ''
 
 
-def _get_lazyload_commands(multicommand: click.MultiCommand):
+def _get_lazyload_commands(multicommand: click.MultiCommand, ) -> Dict[str, Optional[click.Command]]:
 	commands = {}
 
 	for command in multicommand.list_commands(multicommand):  # type: ignore
@@ -331,7 +335,10 @@ def _get_lazyload_commands(multicommand: click.MultiCommand):
 	return commands
 
 
-def _filter_commands(ctx: click.Context, commands=None):
+def _filter_commands(
+		ctx: click.Context,
+		commands: Optional[str] = None,
+		) -> List[click.Command]:
 	"""
 	Return list of used commands.
 	"""
@@ -349,7 +356,11 @@ def _filter_commands(ctx: click.Context, commands=None):
 	return [lookup[name] for name in names if name in lookup]
 
 
-def _format_command(ctx: click.Context, nested: NestedOption, commands=None):
+def _format_command(
+		ctx: click.Context,
+		nested: NestedOption,
+		commands: Optional[str] = None,
+		) -> Iterator[str]:
 	"""
 	Format the output of :class:`click.Command`.
 	"""
@@ -398,16 +409,16 @@ def _format_command(ctx: click.Context, nested: NestedOption, commands=None):
 	if nested in (NestedOption.NESTED_FULL, NestedOption.NESTED_NONE):
 		return
 
-	commands = _filter_commands(ctx, commands)
+	command_objs = _filter_commands(ctx, commands)
 
-	if commands:
+	if command_objs:
 		yield ".. rubric:: Commands"
 		yield ''
 
-	for command in commands:
+	for command_obj in command_objs:
 		# Don't show hidden subcommands
-		if not command.hidden:
-			yield from _format_subcommand(command)
+		if not command_obj.hidden:
+			yield from _format_subcommand(command_obj)
 			yield ''
 
 
@@ -444,20 +455,20 @@ class ClickDirective(SphinxDirective):
 			command: click.Command,
 			parent: Optional[click.Context],
 			nested: NestedOption,
-			commands=None,
-			):
+			commands: Optional[str] = None,
+			) -> List[nodes.Node]:
 		"""
 		Generate the relevant Sphinx nodes.
 
 		Format a :class:`click.Group` or :class:`click.Command`.
 
-		:param name: Name of command, as used on the command line
-		:param command: Instance of `click.Group` or `click.Command`
+		:param name: Name of command, as used on the command line.
+		:param command: Instance of `click.Group` or `click.Command`.
 		:param parent: Instance of `click.Context`, or None
 		:param nested: The granularity of subcommand details.
-		:param commands: Display only listed commands or skip the section if empty
+		:param commands: Display only listed commands or skip the section if empty.
 
-		:returns: A list of nested docutils nodes
+		:returns: A list of nested docutils nodes.
 		"""
 
 		if command.hidden:
@@ -472,7 +483,11 @@ class ClickDirective(SphinxDirective):
 
 		view = ViewList(content)
 		click_node = nodes.paragraph(rawsource='\n'.join(content))
-		self.state.nested_parse(view, self.content_offset, click_node)
+		self.state.nested_parse(
+				view,  # type: ignore[arg-type]
+				self.content_offset,
+				click_node,
+				)
 
 		click_purger.add_node(self.env, click_node, targetnode, self.lineno)
 
@@ -509,6 +524,7 @@ class ClickDirective(SphinxDirective):
 
 		if not isinstance(parser, click.BaseCommand):
 			raise self.error(f'"{type(parser)}" of type "{module_path}" is not derived from "click.BaseCommand"')
+
 		return parser
 
 	def run(self):  # noqa: D102
@@ -517,9 +533,9 @@ class ClickDirective(SphinxDirective):
 		if "prog" not in self.options:
 			raise self.error(":prog: must be specified")
 
-		prog_name = self.options.get("prog")
+		prog_name: str = self.options.get("prog")  # type: ignore
 		show_nested = "show-nested" in self.options
-		nested = self.options.get("nested")
+		nested: NestedOption = self.options.get("nested")  # type: ignore
 
 		if show_nested:
 			if nested:
@@ -540,7 +556,7 @@ def env_get_outdated(app, env, added, changed, removed):
 	return [node["docname"] for node in getattr(env, click_purger.attr_name, ())]
 
 
-def setup(app: Sphinx) -> None:
+def setup(app: Sphinx) -> SphinxExtMetadata:
 	"""
 	Setup Sphinx extension.
 	"""
@@ -550,3 +566,8 @@ def setup(app: Sphinx) -> None:
 	app.connect("env-get-outdated", env_get_outdated)
 	app.add_directive("cli-option", Cmdoption)
 	app.add_node(OptionDesc, latex=(LaTeXTranslator.visit_desc, LaTeXTranslator.depart_desc), override=True)
+
+	return {
+			"parallel_read_safe": True,
+			"parallel_write_safe": True,
+			}
