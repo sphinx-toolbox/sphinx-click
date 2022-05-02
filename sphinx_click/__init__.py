@@ -30,6 +30,7 @@ Sphinx extension that automatically documents click applications.
 
 # stdlib
 import enum
+import inspect
 import traceback
 import warnings
 from operator import attrgetter
@@ -160,7 +161,9 @@ def _format_description(ctx: click.Context):
 
 	help_string = ctx.command.help or ctx.command.short_help
 
-	if not help_string:
+	if help_string:
+		help_string = inspect.cleandoc(help_string)
+	else:
 		return
 
 	bar_enabled = False
