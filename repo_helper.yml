@@ -27,4 +27,4 @@ classifiers:
  - "Intended Audience :: Developers"
  - "Intended Audience :: Information Technology"
 
-min_coverage: 75
+min_coverage: 65
