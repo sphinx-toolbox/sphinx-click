@@ -26,12 +26,6 @@ Homepage = "https://github.com/domdfcoding/sphinx-click"
 [tool.dep_checker]
 allowed_unused = [ "jinja2", "markupsafe",]
 
-[tool.mkrecipe]
-conda-channels = [ "domdfcoding",]
-extras = "all"
-license-key = "MIT"
-package = "sphinx_click"
-
 [tool.whey]
 base-classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -44,3 +38,31 @@ python-implementations = [ "CPython",]
 platforms = [ "Windows", "macOS", "Linux",]
 license-key = "MIT"
 package = "sphinx_click"
+
+[tool.mypy]
+python_version = "3.6"
+namespace_packages = true
+check_untyped_defs = true
+warn_unused_ignores = true
+no_implicit_optional = true
+show_error_codes = true
+
+[tool.snippet-fmt]
+directives = [ "code-block",]
+
+[tool.dependency-dash."requirements.txt"]
+order = 10
+
+[tool.dependency-dash."tests/requirements.txt"]
+order = 20
+include = false
+
+[tool.snippet-fmt.languages.python]
+reformat = true
+
+[tool.snippet-fmt.languages.TOML]
+reformat = true
+
+[tool.snippet-fmt.languages.ini]
+
+[tool.snippet-fmt.languages.json]

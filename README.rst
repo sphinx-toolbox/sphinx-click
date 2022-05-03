@@ -44,8 +44,8 @@ sphinx-click
 	:target: https://github.com/domdfcoding/sphinx-click/actions?query=workflow%3A%22mypy%22
 	:alt: mypy status
 
-.. |requires| image:: https://requires.io/github/domdfcoding/sphinx-click/requirements.svg?branch=master
-	:target: https://requires.io/github/domdfcoding/sphinx-click/requirements/?branch=master
+.. |requires| image:: https://dependency-dash.herokuapp.com/github/domdfcoding/sphinx-click/badge.svg
+	:target: https://dependency-dash.herokuapp.com/github/domdfcoding/sphinx-click/
 	:alt: Requirements Status
 
 .. |coveralls| image:: https://img.shields.io/coveralls/github/domdfcoding/sphinx-click/master?logo=coveralls
@@ -71,7 +71,7 @@ sphinx-click
 	:target: https://github.com/domdfcoding/sphinx-click/commit/master
 	:alt: GitHub last commit
 
-.. |maintained| image:: https://img.shields.io/maintenance/yes/2021
+.. |maintained| image:: https://img.shields.io/maintenance/yes/2022
 	:alt: Maintenance
 
 .. end shields
