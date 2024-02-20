@@ -326,7 +326,7 @@ def _format_epilog(ctx: click.Context) -> Iterator[str]:
 	yield ''
 
 
-def _get_lazyload_commands(multicommand: click.MultiCommand, ) -> Dict[str, Optional[click.Command]]:
+def _get_lazyload_commands(multicommand: click.MultiCommand) -> Dict[str, Optional[click.Command]]:
 	commands = {}
 
 	for command in multicommand.list_commands(multicommand):  # type: ignore
@@ -464,7 +464,7 @@ class ClickDirective(SphinxDirective):
 
 		:param name: Name of command, as used on the command line.
 		:param command: Instance of `click.Group` or `click.Command`.
-		:param parent: Instance of `click.Context`, or None
+		:param parent: Instance of `click.Context`, or :py:obj:`None`.
 		:param nested: The granularity of subcommand details.
 		:param commands: Display only listed commands or skip the section if empty.
 
