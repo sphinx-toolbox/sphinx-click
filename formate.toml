@@ -50,5 +50,5 @@ known_third_party = [
     "sphinx",
     "sphinx_toolbox",
 ]
-known_first_party = "sphinx_click"
+known_first_party = [ "sphinx_click",]
 line_length = 115
