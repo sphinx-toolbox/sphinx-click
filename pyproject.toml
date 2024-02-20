@@ -19,9 +19,9 @@ email = "dominic@davis-foster.co.uk"
 file = "LICENSE"
 
 [project.urls]
-Homepage = "https://github.com/domdfcoding/sphinx-click"
-"Issue Tracker" = "https://github.com/domdfcoding/sphinx-click/issues"
-"Source Code" = "https://github.com/domdfcoding/sphinx-click"
+Homepage = "https://github.com/sphinx-toolbox/sphinx-click"
+"Issue Tracker" = "https://github.com/sphinx-toolbox/sphinx-click/issues"
+"Source Code" = "https://github.com/sphinx-toolbox/sphinx-click"
 
 [tool.dep_checker]
 allowed_unused = [ "jinja2", "markupsafe",]
