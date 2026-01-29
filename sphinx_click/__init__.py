@@ -78,7 +78,7 @@ def _indent(text: str):
 	return '\n'.join([f"    {line}" if not line.isspace() else line for line in text.split('\n')])
 
 
-def _get_usage(ctx: click.Context) -> str:
+def _get_usage(ctx: click.Context) -> str:  # noqa: PRM002
 	"""
 	Alternative, non-prefixed version of 'get_usage'.
 	"""
@@ -89,7 +89,7 @@ def _get_usage(ctx: click.Context) -> str:
 	return formatter.getvalue().rstrip('\n')
 
 
-def _get_help_record(opt: click.Option) -> Tuple[str, str]:
+def _get_help_record(opt: click.Option) -> Tuple[str, str]:  # noqa: PRM002
 	"""
 	Re-implementation of :meth:`click.Option.get_help_record`.
 
@@ -151,7 +151,7 @@ def _get_help_record(opt: click.Option) -> Tuple[str, str]:
 	return ", ".join(rv), '\n'.join(out)
 
 
-def _format_description(ctx: click.Context) -> Iterator[str]:
+def _format_description(ctx: click.Context) -> Iterator[str]:  # noqa: PRM002
 	"""
 	Format the description for a given `click.Command`.
 
@@ -183,7 +183,7 @@ def _format_description(ctx: click.Context) -> Iterator[str]:
 	yield ''
 
 
-def _format_usage(ctx) -> Iterator[str]:
+def _format_usage(ctx) -> Iterator[str]:  # noqa: PRM002
 	"""
 	Format the usage for a `click.Command`.
 	"""
@@ -197,7 +197,7 @@ def _format_usage(ctx) -> Iterator[str]:
 	yield ''
 
 
-def _format_option(opt: click.Option) -> Iterator[str]:
+def _format_option(opt: click.Option) -> Iterator[str]:  # noqa: PRM002
 	"""
 	Format the output for a `click.Option`.
 	"""
@@ -212,7 +212,7 @@ def _format_option(opt: click.Option) -> Iterator[str]:
 			yield _indent(line)
 
 
-def _format_options(ctx: click.Context) -> Iterator[str]:
+def _format_options(ctx: click.Context) -> Iterator[str]:  # noqa: PRM002
 	"""
 	Format all :class:`click.Option` for a :class:`click.Command`.
 	"""
@@ -224,7 +224,7 @@ def _format_options(ctx: click.Context) -> Iterator[str]:
 		yield ''
 
 
-def _format_argument(arg: click.Argument) -> Iterator[str]:
+def _format_argument(arg: click.Argument) -> Iterator[str]:  # noqa: PRM002
 	"""
 	Format the output of a :class:`click.Argument`.
 	"""
@@ -243,7 +243,7 @@ def _format_argument(arg: click.Argument) -> Iterator[str]:
 		yield f"    Default ``{arg.default!r}``"
 
 
-def _format_arguments(ctx: click.Context) -> Iterator[str]:
+def _format_arguments(ctx: click.Context) -> Iterator[str]:  # noqa: PRM002
 	"""
 	Format all `click.Argument` for a `click.Command`.
 	"""
@@ -255,7 +255,7 @@ def _format_arguments(ctx: click.Context) -> Iterator[str]:
 		yield ''
 
 
-def _format_envvar(param) -> Iterator[str]:
+def _format_envvar(param) -> Iterator[str]:  # noqa: PRM002
 	"""
 	Format the envvars of a `click.Option` or `click.Argument`.
 	"""
@@ -275,7 +275,7 @@ def _format_envvar(param) -> Iterator[str]:
 		yield f"    Provides a default for :option:`{param_ref: / } <{param_ref[0]}>`"
 
 
-def _format_envvars(ctx: click.Context) -> Iterator[str]:
+def _format_envvars(ctx: click.Context) -> Iterator[str]:  # noqa: PRM002
 	"""
 	Format all envvars for a :class:`click.Command`.
 	"""
@@ -289,7 +289,7 @@ def _format_envvars(ctx: click.Context) -> Iterator[str]:
 		yield ''
 
 
-def _format_subcommand(command: click.Command) -> Iterator[str]:
+def _format_subcommand(command: click.Command) -> Iterator[str]:  # noqa: PRM002
 	"""
 	Format a sub-command of a :class:`click.Command` or :class:`click.Group`.
 	"""
@@ -309,7 +309,7 @@ def _format_subcommand(command: click.Command) -> Iterator[str]:
 		yield _indent(line)
 
 
-def _format_epilog(ctx: click.Context) -> Iterator[str]:
+def _format_epilog(ctx: click.Context) -> Iterator[str]:  # noqa: PRM002
 	"""
 	Format the epilog for a given :class:`click.Command`.
 
@@ -335,7 +335,7 @@ def _get_lazyload_commands(multicommand: click.MultiCommand) -> Dict[str, Option
 	return commands
 
 
-def _filter_commands(
+def _filter_commands(  # noqa: PRM002
 		ctx: click.Context,
 		commands: Optional[str] = None,
 		) -> List[click.Command]:
@@ -356,7 +356,7 @@ def _filter_commands(
 	return [lookup[name] for name in names if name in lookup]
 
 
-def _format_command(
+def _format_command(  # noqa: PRM002
 		ctx: click.Context,
 		nested: NestedOption,
 		commands: Optional[str] = None,
@@ -556,7 +556,7 @@ def env_get_outdated(app, env, added, changed, removed):
 	return [node["docname"] for node in getattr(env, click_purger.attr_name, ())]
 
 
-def setup(app: Sphinx) -> SphinxExtMetadata:
+def setup(app: Sphinx) -> SphinxExtMetadata:  # noqa: PRM002
 	"""
 	Setup Sphinx extension.
 	"""
